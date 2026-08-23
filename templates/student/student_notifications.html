@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Student</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+    <!-- Dark Mode CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+</head>
+<body>
+    <div class="student-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-user-graduate"></i>
+                <span>Student Panel</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
+                <li class="active"><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
+                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
+                <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left"><h1>Notifications</h1></div>
+                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
+            </header>
+
+            <div class="card">
+                <div class="card-header"><h3>📬 All Notifications</h3></div>
+                <div class="card-body">
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                        <div class="notification-item {% if not notification.read_status %}unread{% endif %}">
+                            <div class="notification-header">
+                                <strong>{{ notification.subject }}</strong>
+                                <span class="date">{{ notification.created_at }}</span>
+                            </div>
+                            <p><small>From: {{ notification.sender_name }} ({{ notification.sender_role }})</small></p>
+                            <p>{{ notification.message }}</p>
+                            {% if not notification.read_status %}
+                                <a href="{{ url_for('student.mark_notification_read', notification_id=notification.id) }}" class="btn-sm">Mark as Read</a>
+                            {% else %}
+                                <span class="badge green">✅ Read</span>
+                            {% endif %}
+                            <hr>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align:center;padding:40px 20px;">
+                            <i class="fas fa-bell" style="font-size:48px;color:#64748b;"></i>
+                            <p style="color:#94a3b8;margin-top:15px;">No notifications yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chat Bubble -->
+    {% include 'chat_bubble.html' %}
+
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

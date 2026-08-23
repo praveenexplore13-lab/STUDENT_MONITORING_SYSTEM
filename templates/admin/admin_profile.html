@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <!-- Dark Mode CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Admin Panel</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('admin.admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('admin.admin_students') }}"><i class="fas fa-users"></i> Students</a></li>
+                <li><a href="{{ url_for('admin.admin_reports') }}"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="{{ url_for('admin.admin_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{{ url_for('admin.admin_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li class="active"><a href="{{ url_for('admin.admin_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
+                <li><a href="{{ url_for('chat.admin_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left"><h1>My Profile</h1></div>
+                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
+            </header>
+
+            <div class="profile-card">
+                <div class="profile-avatar-large">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h2>{{ name }}</h2>
+                <p><i class="fas fa-envelope"></i> {{ email }}</p>
+                <p><i class="fas fa-user-tag"></i> Administrator</p>
+                <div class="profile-stats">
+                    <div class="stat-item"><h3>👑</h3><p>Admin Access</p></div>
+                    <div class="stat-item"><h3>🔒</h3><p>Full Control</p></div>
+                    <div class="stat-item"><h3>📊</h3><p>All Reports</p></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chat Bubble -->
+    {% include 'chat_bubble.html' %}
+
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

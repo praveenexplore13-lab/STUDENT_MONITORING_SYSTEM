@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OD Status - Student</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+    <!-- Dark Mode CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+</head>
+<body>
+    <div class="student-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-user-graduate"></i>
+                <span>Student Panel</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
+                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
+                <li class="active"><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
+                <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left"><h1>OD Status</h1></div>
+                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
+            </header>
+
+            <div class="card">
+                <div class="card-header"><h3>📋 Your OD Requests</h3></div>
+                <div class="card-body">
+                    {% if requests %}
+                        {% for req in requests %}
+                        <div class="od-item" style="border:1px solid #e2e8f0;padding:20px;border-radius:10px;margin-bottom:15px;background:{% if req.admin_status == 'approved' %}#f0fdf4{% elif req.admin_status == 'denied' or req.mentor_status == 'denied' %}#fef2f2{% else %}#fefce8{% endif %};">
+                            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+                                <h3 style="margin:0;">{{ req.title }}</h3>
+                                <span class="badge 
+                                    {% if req.admin_status == 'approved' %}green
+                                    {% elif req.admin_status == 'denied' or req.mentor_status == 'denied' %}red
+                                    {% elif req.mentor_status == 'approved' and req.admin_status == 'pending' %}yellow
+                                    {% else %}yellow{% endif %}" style="font-size:14px;padding:6px 14px;">
+                                    {% if req.admin_status == 'approved' %}✅ Approved (Final)
+                                    {% elif req.admin_status == 'denied' %}❌ Denied by Admin
+                                    {% elif req.mentor_status == 'denied' %}❌ Denied by Mentor
+                                    {% elif req.mentor_status == 'approved' and req.admin_status == 'pending' %}⏳ Waiting for Admin
+                                    {% else %}⏳ Pending{% endif %}
+                                </span>
+                            </div>
+                            <p style="margin-top:10px;"><strong>Date:</strong> {{ req.od_date }}</p>
+                            <p><strong>Description:</strong> {{ req.description }}</p>
+                            {% if req.proof_image %}
+                                <p><a href="javascript:void(0)" onclick="openLightbox('{{ url_for('static', filename=req.proof_image) }}')" style="color:#6366f1;text-decoration:none;font-weight:600;"><i class="fas fa-file-image"></i> View Proof</a></p>
+                            {% endif %}
+                            {% if req.mentor_comment %}
+                                <p><strong>Mentor Comment:</strong> {{ req.mentor_comment }}</p>
+                            {% endif %}
+                            {% if req.admin_comment %}
+                                <p><strong>Admin Comment:</strong> {{ req.admin_comment }}</p>
+                            {% endif %}
+                            <small style="color:#94a3b8;">Submitted: {{ req.created_at }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align:center;padding:40px 20px;">
+                            <i class="fas fa-calendar" style="font-size:48px;color:#64748b;"></i>
+                            <p style="color:#94a3b8;margin-top:15px;">You haven't submitted any OD requests yet.</p>
+                            <a href="{{ url_for('student.student_od_request') }}" class="btn-primary" style="display:inline-block;margin-top:10px;padding:12px 30px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border-radius:10px;text-decoration:none;">Submit OD Request</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Lightbox Overlay -->
+    <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">×</span>
+        <img id="lightbox-img" src="" alt="OD Proof">
+    </div>
+
+    <!-- Chat Bubble -->
+    {% include 'chat_bubble.html' %}
+
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+
+    <script>
+        function openLightbox(imageUrl) {
+            document.getElementById('lightbox-img').src = imageUrl;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
+</body>
+</html>

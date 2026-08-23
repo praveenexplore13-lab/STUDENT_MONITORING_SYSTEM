@@ -1,0 +1,38 @@
+/* ==========================================
+   CHATBOT STYLES
+   ========================================== */
+
+.chat-messages .message.ai a {
+    color: #6366f1;
+    text-decoration: underline;
+}
+
+.chat-messages .message.ai strong {
+    color: #1a1a2e;
+}
+
+body.dark-mode .chat-messages .message.ai strong {
+    color: #e2e8f0;
+}
+
+.quick-reply {
+    display: inline-block;
+    padding: 6px 14px;
+    margin: 4px 4px 4px 0;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.quick-reply:hover {
+    background: #6366f1;
+    color: white;
+}
+
+.chat-messages .message .emoji {
+    font-size: 18px;
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('auth.dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="active"><a href="#"><i class="fas fa-search"></i> Search</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1>🔍 Search Results</h1>
+                </div>
+                <div class="header-right">
+                    <span><i class="fas fa-user"></i> {{ name }}</span>
+                </div>
+            </header>
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('search.search_page') }}" style="display:flex;gap:10px;">
+                        <input type="text" name="q" value="{{ query }}" placeholder="Search students, notes..." style="flex:1;padding:12px;border:2px solid #e2e8f0;border-radius:8px;font-size:16px;">
+                        <button type="submit" class="btn-primary" style="padding:12px 30px;">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>📋 Results for "{{ query }}"</h3>
+                    <span>{{ results|length }} found</span>
+                </div>
+                <div class="card-body">
+                    {% if results %}
+                        {% for result in results %}
+                        <div class="result-item" style="border-bottom:1px solid #e2e8f0;padding:15px 0;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    {% if result.type == 'student' %}
+                                        <span class="badge blue">👤 Student</span>
+                                        <strong>{{ result.name }}</strong>
+                                        <p style="color:#64748b;font-size:14px;">
+                                            Roll: {{ result.roll_number }} | Dept: {{ result.department }}
+                                        </p>
+                                    {% elif result.type == 'note' %}
+                                        <span class="badge purple">📝 Note</span>
+                                        <strong>{{ result.student_name }}</strong>
+                                        <p style="color:#64748b;font-size:14px;">{{ result.note[:100] }}...</p>
+                                        <p style="color:#94a3b8;font-size:12px;">By: {{ result.mentor_name }} | {{ result.date }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if result.type == 'student' %}
+                                        <a href="{{ url_for('admin.admin_student_detail', student_id=result.id) }}" class="btn-sm">View</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="text-align:center;padding:40px 20px;">
+                            <i class="fas fa-search" style="font-size:48px;color:#64748b;"></i>
+                            <p style="color:#94a3b8;margin-top:15px;">
+                                {% if query %}
+                                    No results found for "{{ query }}"
+                                {% else %}
+                                    Type something to search
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

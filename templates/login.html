@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - OTP System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Sign-In Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    #bg-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+    .video-overlay { position: fixed; inset: 0; background: rgba(4, 8, 25, 0.45); z-index: -1; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .container { width: 100%; max-width: 450px; position: relative; z-index: 1; }
+    .auth-card { background: rgba(10, 15, 40, 0.72); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 40px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.22); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(99, 102, 241, 0.25); animation: slideUp 0.6s ease; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .auth-header { text-align: center; margin-bottom: 30px; }
+    .auth-header h1 { color: white; font-size: 30px; margin-bottom: 8px; text-shadow: 0 0 15px rgba(165, 180, 252, 0.7); }
+    .auth-header h1 i { color: #a5b4fc; }
+    .auth-header p { color: #cbd5e1; font-size: 14px; }
+    .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 500; animation: slideDown 0.3s ease; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .alert-success { background: rgba(16, 185, 129, 0.2); color: #a7f3d0; border-left: 4px solid #10b981; }
+    .alert-error { background: rgba(239, 68, 68, 0.2); color: #fecaca; border-left: 4px solid #ef4444; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 7px; color: #e2e8f0; font-weight: 600; font-size: 14px; }
+    .form-group label i { color: #a5b4fc; width: 20px; }
+    .form-group input { width: 100%; padding: 13px 16px; background: rgba(255, 255, 255, 0.10); color: white; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 10px; font-size: 15px; transition: all 0.3s; }
+    .form-group input::placeholder { color: #94a3b8; }
+    .form-group input:focus { outline: none; border-color: #818cf8; background: rgba(255, 255, 255, 0.15); box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.20), 0 0 20px rgba(99, 102, 241, 0.25); }
+    .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .form-options label { color: #cbd5e1; font-size: 14px; cursor: pointer; }
+    .form-options label input { width: auto; margin-right: 5px; accent-color: #818cf8; }
+    .form-options a { color: #a5b4fc; text-decoration: none; font-size: 14px; }
+    .form-options a:hover { color: white; text-shadow: 0 0 10px #818cf8; }
+    .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(99, 102, 241, 0.6), 0 0 20px rgba(139, 92, 246, 0.4); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .divider { display: flex; align-items: center; margin: 25px 0; color: #cbd5e1; font-size: 14px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.20); }
+    .divider::before { margin-right: 15px; }
+    .divider::after { margin-left: 15px; }
+    .google-login { display: flex; justify-content: center; margin: 10px 0; }
+    .google-login .g_id_signin { width: 100% !important; max-width: 300px; }
+    .google-login iframe { width: 100% !important; max-width: 300px; }
+    .auth-footer { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.15); }
+    .auth-footer p { color: #cbd5e1; font-size: 14px; }
+    .auth-footer a { color: #a5b4fc; text-decoration: none; font-weight: 600; }
+    .auth-footer a:hover { color: white; text-shadow: 0 0 10px #818cf8; }
+    @media (max-width: 600px) { .auth-card { padding: 25px; } .auth-header h1 { font-size: 24px; } .form-options { flex-direction: column; gap: 10px; align-items: flex-start; } .google-login .g_id_signin, .google-login iframe { max-width: 100% !important; } }
+</style>
+</head>
+<body>
+<video autoplay muted loop playsinline id="bg-video">
+    <source src="{{ url_for('static', filename='video/anime-bg.mp4') }}" type="video/mp4">
+</video>
+<div class="video-overlay"></div>
+
+<div class="container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-sign-in-alt"></i> Welcome Back</h1>
+            <p>Login to your account</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" autocomplete="off">
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <div class="form-options">
+                <label><input type="checkbox" name="remember" id="rememberMe"> Remember Me</label>
+                <a href="{{ url_for('auth.forgot_password') }}">Forgot Password?</a>
+            </div>
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+
+        <!-- ========================================== -->
+        <!-- DIVIDER -->
+        <!-- ========================================== -->
+        <div class="divider">OR</div>
+
+        <!-- ========================================== -->
+        <!-- GOOGLE LOGIN -->
+        <!-- ========================================== -->
+        <div class="google-login">
+            <div id="g_id_onload"
+                 data-client_id="{{ client_id }}"
+                 data-callback="handleGoogleLogin"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+        </div>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{{ url_for('auth.register') }}">Register Here</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('rememberMe').checked = false;
+        localStorage.removeItem('remembered_email');
+
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s';
+                setTimeout(() => { alert.remove(); }, 500);
+            }, 5000);
+        });
+
+        const rememberCheckbox = document.getElementById('rememberMe');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+
+        const savedEmail = localStorage.getItem('remembered_email');
+        if (savedEmail) {
+            emailInput.value = savedEmail;
+            rememberCheckbox.checked = true;
+            passwordInput.focus();
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            if (rememberCheckbox.checked) {
+                localStorage.setItem('remembered_email', emailInput.value);
+            } else {
+                localStorage.removeItem('remembered_email');
+            }
+        });
+
+        window.handleGoogleLogin = function(response) {
+            const loginBtn = document.getElementById('loginBtn');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+            fetch('/google-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: response.credential })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('✅ ' + data.message, 'success');
+                    clearFormFields();
+                    setTimeout(() => { window.location.href = '/dashboard'; }, 1000);
+                } else {
+                    showAlert('❌ ' + data.message, 'error');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Google login error:', error);
+                showAlert('❌ Google login failed. Please try again.', 'error');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = originalText;
+            });
+        };
+
+        function clearFormFields() {
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('rememberMe').checked = false;
+            localStorage.removeItem('remembered_email');
+        }
+
+        function showAlert(message, type) {
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            const form = document.querySelector('form');
+            form.parentNode.insertBefore(alertDiv, form);
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                alertDiv.style.transition = 'opacity 0.5s';
+                setTimeout(() => { alertDiv.remove(); }, 500);
+            }, 5000);
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('logout') === 'true') {
+            clearFormFields();
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        document.getElementById('loginForm').setAttribute('autocomplete', 'off');
+        
+        window.addEventListener('beforeunload', function() {
+            if (!document.getElementById('rememberMe').checked) {
+                localStorage.removeItem('remembered_email');
+            }
+        });
+    });
+</script>
+</body>
+</html>

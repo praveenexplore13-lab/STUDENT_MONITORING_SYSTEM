@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OD Request Detail - Mentor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mentor.css') }}">
+    <!-- Dark Mode CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+</head>
+<body>
+    <div class="mentor-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Mentor Panel</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('mentor.mentor_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('mentor.mentor_students') }}"><i class="fas fa-users"></i> Students</a></li>
+                <li><a href="{{ url_for('mentor.mentor_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li class="active"><a href="{{ url_for('mentor.mentor_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li><a href="{{ url_for('mentor.mentor_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
+                <li><a href="{{ url_for('chat.mentor_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left"><h1>OD Request Detail</h1></div>
+                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
+            </header>
+
+            <div class="card">
+                <div class="card-header"><h3>📋 Request Details</h3></div>
+                <div class="card-body">
+                    <div style="margin-bottom:20px;">
+                        <p><strong>Student:</strong> {{ request.student_name }}</p>
+                        <p><strong>Email:</strong> {{ request.student_email }}</p>
+                        <p><strong>Roll Number:</strong> {{ request.roll_number }}</p>
+                        <p><strong>Department:</strong> {{ request.department }}</p>
+                        <p><strong>Title:</strong> {{ request.title }}</p>
+                        <p><strong>Description:</strong> {{ request.description }}</p>
+                        <p><strong>OD Date:</strong> {{ request.od_date }}</p>
+                        {% if request.proof_image %}
+                            <p><strong>Proof:</strong> <a href="javascript:void(0)" onclick="openLightbox('{{ url_for('static', filename=request.proof_image) }}')" style="color:#6366f1;text-decoration:none;font-weight:600;"><i class="fas fa-file-image"></i> View Document</a></p>
+                        {% endif %}
+                        <p><strong>Status:</strong> <span class="badge yellow" style="font-size:14px;padding:6px 14px;">⏳ Pending Mentor Approval</span></p>
+                    </div>
+
+                    <hr>
+
+                    <form method="POST" action="{{ url_for('mentor.mentor_od_detail', request_id=request.id) }}">
+                        <div class="form-group">
+                            <label><i class="fas fa-comment"></i> Comment</label>
+                            <textarea name="comment" rows="3" placeholder="Add your comment..." style="width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;"></textarea>
+                        </div>
+                        <div class="form-actions" style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
+                            <button type="submit" name="action" value="approve" class="btn-primary" style="background:#10b981;border:none;padding:12px 30px;border-radius:8px;color:white;font-weight:600;cursor:pointer;"><i class="fas fa-check"></i> Approve</button>
+                            <button type="submit" name="action" value="deny" class="btn-primary" style="background:#ef4444;border:none;padding:12px 30px;border-radius:8px;color:white;font-weight:600;cursor:pointer;"><i class="fas fa-times"></i> Deny</button>
+                            <a href="{{ url_for('mentor.mentor_od_requests') }}" class="btn-secondary" style="background:#e2e8f0;padding:12px 30px;border-radius:8px;text-decoration:none;color:#1a1a2e;font-weight:600;">Back</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Lightbox Overlay -->
+    <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">×</span>
+        <img id="lightbox-img" src="" alt="OD Proof">
+    </div>
+
+    <!-- Chat Bubble -->
+    {% include 'chat_bubble.html' %}
+
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+
+    <script>
+        function openLightbox(imageUrl) {
+            document.getElementById('lightbox-img').src = imageUrl;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+    </script>
+</body>
+</html>

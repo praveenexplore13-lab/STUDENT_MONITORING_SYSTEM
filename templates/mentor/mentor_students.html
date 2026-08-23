@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Students - Mentor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mentor.css') }}">
+    <!-- Dark Mode CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+</head>
+<body>
+    <div class="mentor-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Mentor Panel</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('mentor.mentor_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="active"><a href="{{ url_for('mentor.mentor_students') }}"><i class="fas fa-users"></i> Students</a></li>
+                <li><a href="{{ url_for('mentor.mentor_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{{ url_for('mentor.mentor_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li><a href="{{ url_for('mentor.mentor_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
+                <li><a href="{{ url_for('chat.mentor_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left"><h1>All Students</h1></div>
+                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
+            </header>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-users"></i> Student List</h2>
+                    <input type="text" id="searchInput" placeholder="Search..." onkeyup="filterTable()">
+                </div>
+                <div class="card-body">
+                    <table class="table" id="studentTable">
+                        <thead>
+                            <tr><th>#</th><th>Name</th><th>Roll No</th><th>Department</th><th>CGPA</th><th>Attendance</th><th>Risk</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ student.name }}</td>
+                                <td>{{ student.roll_number or '-' }}</td>
+                                <td>{{ student.department or '-' }}</td>
+                                <td>{{ student.cgpa or '-' }}</td>
+                                <td>{{ student.attendance_percentage or '-' }}%</td>
+                                <td>
+                                    {% if student.risk_level == 'high' %}
+                                        <span class="badge red">🔴 High</span>
+                                    {% elif student.risk_level == 'medium' %}
+                                        <span class="badge yellow">🟡 Medium</span>
+                                    {% else %}
+                                        <span class="badge green">🟢 Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('mentor.mentor_student_detail', student_id=student.id) }}" class="btn-sm">View</a>
+                                    <a href="{{ url_for('mentor.mentor_edit_student', student_id=student.id) }}" class="btn-sm edit">Edit</a>
+                                    <a href="{{ url_for('mentor.mentor_add_note', student_id=student.id) }}" class="btn-sm note">Add Note</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Chat Bubble -->
+    {% include 'chat_bubble.html' %}
+
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+
+    <script>
+        function filterTable() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('studentTable');
+            const rows = table.getElementsByTagName('tr');
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                for (let j = 0; j < cells.length; j++) {
+                    const text = cells[j].textContent || cells[j].innerText;
+                    if (text.toUpperCase().indexOf(filter) > -1) { found = true; break; }
+                }
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+    </script>
+</body>
+</html>
