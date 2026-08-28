@@ -11,7 +11,6 @@
 </head>
 <body>
     <div class="admin-container">
-        <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-brand">
                 <i class="fas fa-graduation-cap"></i>
@@ -23,62 +22,44 @@
                 <li><a href="{{ url_for('admin.admin_reports') }}"><i class="fas fa-chart-bar"></i> Reports</a></li>
                 <li><a href="{{ url_for('admin.admin_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="{{ url_for('admin.admin_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li><a href="{{ url_for('attendance_otp.admin_reports') }}"><i class="fas fa-file-alt"></i> Attendance Reports</a></li>
+                <li><a href="{{ url_for('attendance.admin_engagement') }}"><i class="fas fa-chart-line"></i> Engagement</a></li>
                 <li><a href="{{ url_for('admin.admin_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
                 <li><a href="{{ url_for('chat.admin_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
-                <div class="header-left">
-                    <h1>Dashboard</h1>
-                </div>
-                <div class="header-right">
-                    <span><i class="fas fa-user"></i> {{ name }}</span>
-                </div>
+                <div class="header-left"><h1>Dashboard</h1></div>
+                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
             </header>
 
-            <!-- Voice Welcome -->
             <div class="voice-welcome" id="voiceWelcome">
                 <i class="fas fa-volume-up"></i>
                 <span id="voiceMessage">{{ voice_message }}</span>
             </div>
 
-            <!-- Stats Cards -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-                    <div class="stat-info">
-                        <h3>{{ students|length }}</h3>
-                        <p>Total Students</p>
-                    </div>
+                    <div class="stat-info"><h3>{{ students|length }}</h3><p>Total Students</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="stat-info">
-                        <h3>{{ students|selectattr('risk.risk_level', 'equalto', 'high')|list|length }}</h3>
-                        <p>At Risk (High)</p>
-                    </div>
+                    <div class="stat-info"><h3>{{ students|selectattr('risk.risk_level', 'equalto', 'high')|list|length }}</h3><p>At Risk (High)</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
-                    <div class="stat-info">
-                        <h3>{{ students|selectattr('risk.risk_level', 'equalto', 'medium')|list|length }}</h3>
-                        <p>At Risk (Medium)</p>
-                    </div>
+                    <div class="stat-info"><h3>{{ students|selectattr('risk.risk_level', 'equalto', 'medium')|list|length }}</h3><p>At Risk (Medium)</p></div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-info">
-                        <h3>{{ students|selectattr('risk.risk_level', 'equalto', 'low')|list|length }}</h3>
-                        <p>Safe (Low)</p>
-                    </div>
+                    <div class="stat-info"><h3>{{ students|selectattr('risk.risk_level', 'equalto', 'low')|list|length }}</h3><p>Safe (Low)</p></div>
                 </div>
             </div>
 
-            <!-- Recent Students -->
             <div class="card">
                 <div class="card-header">
                     <h2><i class="fas fa-users"></i> Student List</h2>
@@ -87,15 +68,7 @@
                 <div class="card-body">
                     <table class="table">
                         <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Roll No</th>
-                                <th>Department</th>
-                                <th>CGPA</th>
-                                <th>Attendance</th>
-                                <th>Risk</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Name</th><th>Roll No</th><th>Department</th><th>CGPA</th><th>Attendance</th><th>Risk</th><th>Action</th></tr>
                         </thead>
                         <tbody>
                             {% for student in students[:5] %}
@@ -105,15 +78,7 @@
                                 <td>{{ student.department or '-' }}</td>
                                 <td>{{ student.cgpa or '-' }}</td>
                                 <td>{{ student.attendance_percentage or '-' }}%</td>
-                                <td>
-                                    {% if student.risk and student.risk.risk_level == 'high' %}
-                                        <span class="badge red">🔴 High</span>
-                                    {% elif student.risk and student.risk.risk_level == 'medium' %}
-                                        <span class="badge yellow">🟡 Medium</span>
-                                    {% else %}
-                                        <span class="badge green">🟢 Low</span>
-                                    {% endif %}
-                                </td>
+                                <td>{% if student.risk and student.risk.risk_level == 'high' %}<span class="badge red">🔴 High</span>{% elif student.risk and student.risk.risk_level == 'medium' %}<span class="badge yellow">🟡 Medium</span>{% else %}<span class="badge green">🟢 Low</span>{% endif %}</td>
                                 <td><a href="{{ url_for('admin.admin_student_detail', student_id=student.id) }}" class="btn-sm">View</a></td>
                             </tr>
                             {% endfor %}
@@ -124,14 +89,9 @@
         </main>
     </div>
 
-    <!-- Chat Bubble -->
     {% include 'chat_bubble.html' %}
-
-    <!-- Theme Toggle Script -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
-
     <script>
-        // Auto play voice welcome
         setTimeout(function() {
             const msg = document.getElementById('voiceMessage').textContent;
             if (msg && 'speechSynthesis' in window) {

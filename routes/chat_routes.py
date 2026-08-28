@@ -1,18 +1,21 @@
 # ==========================================
-# AI CHATBOT ROUTES (UPDATED WITH ROLE PAGES)
+# AI CHATBOT ROUTES (WITH GEMINI AI)
 # ==========================================
 
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
+from config import Config
 from models.student_model import StudentModel
 from models.risk_flag_model import RiskFlagModel
 from models.user_model import UserModel
 from models.mentor_note_model import MentorNoteModel
 from utils.file_utils import save_od_image
-import ollama
-import os
+from utils.chat_utils import GeminiChat
 import re
 
 chat_bp = Blueprint('chat', __name__, url_prefix='/chat')
+
+# Initialize Gemini AI
+gemini = GeminiChat()
 
 
 # ==========================================
@@ -44,7 +47,6 @@ def mentor_chat():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
-    # Get all students for sidebar
     all_students = StudentModel.get_all()
     for student in all_students:
         risk = RiskFlagModel.get_by_student(student['id'])
@@ -64,7 +66,6 @@ def admin_chat():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     
-    # Get all students for sidebar
     all_students = StudentModel.get_all()
     for student in all_students:
         risk = RiskFlagModel.get_by_student(student['id'])
@@ -78,13 +79,9 @@ def admin_chat():
                          all_students=all_students)
 
 
-# ==========================================
-# CHAT API (UNCHANGED - WORKS FOR ALL ROLES)
-# ==========================================
-
 @chat_bp.route('/api', methods=['POST'])
 def chat_api():
-    """AI Chat API"""
+    """AI Chat API with Gemini"""
     if 'user_id' not in session:
         return jsonify({'error': 'Please login first'}), 401
     
@@ -94,18 +91,8 @@ def chat_api():
     
     message = request.form.get('message', '').strip()
     file = request.files.get('file')
-    file_info = None
     
-    if file and file.filename:
-        file_path = save_od_image(file)
-        if file_path:
-            file_info = {
-                'name': file.filename,
-                'path': file_path,
-                'size': file.content_length
-            }
-    
-    if not message and not file_info:
+    if not message and not file:
         return jsonify({'reply': 'Please ask something or upload a file!'})
     
     try:
@@ -118,41 +105,42 @@ def chat_api():
                 return jsonify({'reply': "⚠️ Please complete your profile first."})
             
             risk = RiskFlagModel.get_by_student(student['id'])
-            data_str = build_student_data_string(student, risk)
+            if risk:
+                student['risk'] = risk
             
             # Check if asking about profile/risk
             if is_profile_query(message):
                 return jsonify({'reply': generate_student_response(student, risk)})
             
-            # General question
-            reply = get_ollama_response(message, role, data_str, file_info)
-            return jsonify({'reply': reply})
+            # Use Gemini for response
+            response = gemini.get_response(message, student, file)
+            return jsonify({'reply': response})
         
         # ==========================================
         # MENTOR / ADMIN: Can see ALL students
         # ==========================================
         elif role in ['admin', 'mentor']:
-            # Check if asking about high risk students
+            # Check for high risk students
             if 'high risk' in message.lower() or 'which student' in message.lower():
                 return jsonify({'reply': get_high_risk_students()})
             
-            # Check if asking about low attendance
+            # Check for low attendance
             if 'low attendance' in message.lower():
                 return jsonify({'reply': get_low_attendance_students()})
             
-            # Check if asking about a specific student
+            # Check for specific student
             student_name = extract_student_name(message)
             if student_name:
                 return jsonify({'reply': analyze_specific_student(student_name)})
             
-            # Check if asking about summary
+            # Check for summary
             if 'summary' in message.lower() or 'overview' in message.lower():
                 return jsonify({'reply': get_summary_report()})
             
             # General question with all student data context
             all_students_data = get_all_students_data_string()
-            reply = get_ollama_response(message, role, all_students_data, file_info)
-            return jsonify({'reply': reply})
+            response = gemini.get_response(message, all_students_data, file)
+            return jsonify({'reply': response})
         
         # ==========================================
         # FALLBACK
@@ -204,80 +192,8 @@ def extract_student_name(message):
     return None
 
 
-def build_student_data_string(student, risk):
-    data = f"""
-STUDENT PROFILE:
-- Name: {student.get('name', 'Not set')}
-- Roll Number: {student.get('roll_number', 'Not set')}
-- Department: {student.get('department', 'Not set')}
-- CGPA: {student.get('cgpa', 'Not set')}
-- Attendance: {student.get('attendance_percentage', 'Not set')}%
-- Internal Marks: {student.get('internal_marks', 'Not set')}
-- Assignments: {student.get('assignments_submitted', '0')}/{student.get('total_assignments', '0')}
-"""
-    if risk:
-        data += f"- Risk Level: {risk.get('risk_level', 'Not set').upper()}\n"
-        data += f"- Risk Factors: {risk.get('risk_factors', 'No risk factors')}\n"
-    return data
-
-
-def get_all_students_data_string():
-    students = StudentModel.get_all()
-    if not students:
-        return "No students in the system."
-    data = "ALL STUDENTS DATA:\n\n"
-    for i, student in enumerate(students, 1):
-        risk = RiskFlagModel.get_by_student(student['id'])
-        data += f"{i}. {student.get('name', 'Unknown')} (Roll: {student.get('roll_number', 'N/A')})\n"
-        data += f"   - CGPA: {student.get('cgpa', 'N/A')}\n"
-        data += f"   - Attendance: {student.get('attendance_percentage', 'N/A')}%\n"
-        if risk:
-            data += f"   - Risk: {risk.get('risk_level', 'N/A').upper()}\n"
-        data += "\n"
-    return data
-
-
-def get_ollama_response(message, role, data_context, file_info=None):
-    try:
-        role_prompt = {
-            'student': "You are a helpful AI assistant for a student. Use their data to help them.",
-            'mentor': "You are a helpful AI assistant for a mentor. Provide professional insights.",
-            'admin': "You are a helpful AI assistant for an administrator. Provide detailed overviews."
-        }
-        
-        prompt = f"""
-{role_prompt.get(role, 'You are a helpful AI assistant.')}
-
-DATA:
-{data_context}
-
-USER QUESTION: {message}
-
-INSTRUCTIONS:
-1. If the question is about the student's data, use the data above.
-2. If the question is general, answer it naturally.
-3. Be friendly, helpful, and professional.
-4. For mentors/admin: If asked about students, use the data above.
-
-ANSWER:
-"""
-        if file_info:
-            prompt += f"\nThe user uploaded a file: {file_info['name']}. Acknowledge it."
-
-        response = ollama.chat(
-            model='llama3.2:1b',
-            messages=[
-                {'role': 'system', 'content': "You are a helpful AI assistant. Answer questions using the provided data when relevant."},
-                {'role': 'user', 'content': prompt}
-            ]
-        )
-        return response['message']['content']
-    except Exception as e:
-        print(f"❌ Ollama error: {e}")
-        return "🤖 I'm having trouble connecting. Please try again!"
-
-
 def generate_student_response(student, risk):
+    """Generate response for student profile questions"""
     response = "📊 **Your Profile Analysis:**\n\n"
     response += f"📋 **Student:** {student.get('name', 'Unknown')}\n"
     response += f"🎓 **Roll Number:** {student.get('roll_number', 'Not set')}\n"
@@ -290,6 +206,7 @@ def generate_student_response(student, risk):
     if risk:
         response += f"⚠️ **Risk Level:** {risk.get('risk_level', 'Not set').upper()}\n"
         response += f"📝 **Risk Factors:** {risk.get('risk_factors', 'No risk factors')}\n\n"
+        
         if risk.get('risk_level') == 'high':
             response += "💡 **Advice:** 🔴 You are at HIGH risk. Meet your mentor immediately."
         elif risk.get('risk_level') == 'medium':
@@ -381,3 +298,19 @@ def get_summary_report():
     if high > 0:
         response += f"\n⚠️ **Alert:** {high} students need immediate attention!"
     return response
+
+
+def get_all_students_data_string():
+    students = StudentModel.get_all()
+    if not students:
+        return "No students in the system."
+    data = "ALL STUDENTS DATA:\n\n"
+    for i, student in enumerate(students, 1):
+        risk = RiskFlagModel.get_by_student(student['id'])
+        data += f"{i}. {student.get('name', 'Unknown')} (Roll: {student.get('roll_number', 'N/A')})\n"
+        data += f"   - CGPA: {student.get('cgpa', 'N/A')}\n"
+        data += f"   - Attendance: {student.get('attendance_percentage', 'N/A')}%\n"
+        if risk:
+            data += f"   - Risk: {risk.get('risk_level', 'N/A').upper()}\n"
+        data += "\n"
+    return data

@@ -6,7 +6,6 @@
     <title>Student Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
-    <!-- Dark Mode CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
 <body>
@@ -24,6 +23,9 @@
                 <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
                 <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
+                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My Engagement</a></li>
                 <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
@@ -35,7 +37,6 @@
                 <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
             </header>
 
-            <!-- Voice Welcome - Only show if student has profile -->
             {% if student %}
             <div class="voice-welcome" id="voiceWelcome">
                 <i class="fas fa-volume-up"></i>
@@ -113,20 +114,12 @@
         </main>
     </div>
 
-    <!-- Chat Bubble -->
     {% include 'chat_bubble.html' %}
-
-    <!-- Theme Toggle Script -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
-
     <script>
         {% if student %}
         let voices = [];
-
-        function loadVoices() {
-            voices = speechSynthesis.getVoices();
-        }
-
+        function loadVoices() { voices = speechSynthesis.getVoices(); }
         speechSynthesis.onvoiceschanged = loadVoices;
         loadVoices();
 
@@ -134,63 +127,31 @@
             const statusDiv = document.getElementById('voiceWelcome');
             const nameElement = document.querySelector('.profile-info h2');
             const name = nameElement ? nameElement.textContent.trim() : 'User';
-
             speechSynthesis.cancel();
-
-            const message = new SpeechSynthesisUtterance(
-                `Welcome back`
-            );
-
-            let selectedVoice =
-                voices.find(voice => voice.name.includes("Google US English")) ||
+            const message = new SpeechSynthesisUtterance(`Welcome back, ${name}! We're so happy to see you again. Have a wonderful day!`);
+            let selectedVoice = voices.find(voice => voice.name.includes("Google US English")) ||
                 voices.find(voice => voice.name.includes("Microsoft Zira")) ||
                 voices.find(voice => voice.name.includes("Samantha")) ||
                 voices.find(voice => voice.lang.startsWith("en-US")) ||
                 voices.find(voice => voice.lang.startsWith("en"));
-
-            if (selectedVoice) {
-                message.voice = selectedVoice;
-            }
-
-            message.rate = 0.9;
-            message.pitch = 1;
-            message.volume = 1;
-
+            if (selectedVoice) { message.voice = selectedVoice; }
+            message.rate = 0.9; message.pitch = 1; message.volume = 1;
             if (statusDiv) {
-                statusDiv.innerHTML = `
-                    <i class="fas fa-volume-up" style="color: #10b981; animation: pulse 1s ease-in-out infinite;"></i>
-                    <span style="color: #10b981;">🔊 Speaking welcome message...</span>
-                `;
+                statusDiv.innerHTML = `<i class="fas fa-volume-up" style="color: #10b981; animation: pulse 1s ease-in-out infinite;"></i><span style="color: #10b981;">🔊 Speaking welcome message...</span>`;
             }
-
             message.onend = function() {
                 if (statusDiv) {
-                    statusDiv.innerHTML = `
-                        <i class="fas fa-check-circle" style="color: #a5b4fc;"></i>
-                        <span style="color: #a5b4fc;">✅ Welcome complete!</span>
-                    `;
+                    statusDiv.innerHTML = `<i class="fas fa-check-circle" style="color: #a5b4fc;"></i><span style="color: #a5b4fc;">✅ Welcome complete!</span>`;
                 }
             };
-
             message.onerror = function() {
                 if (statusDiv) {
-                    statusDiv.innerHTML = `
-                        <i class="fas fa-exclamation-circle" style="color: #f87171;"></i>
-                        <span style="color: #f87171;">❌ Error speaking</span>
-                    `;
+                    statusDiv.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #f87171;"></i><span style="color: #f87171;">❌ Error speaking</span>`;
                 }
             };
-
-            try {
-                speechSynthesis.speak(message);
-            } catch (error) {
-                console.error('Speech error:', error);
-            }
+            try { speechSynthesis.speak(message); } catch (error) { console.error('Speech error:', error); }
         }
-
-        setTimeout(function() {
-            speakWelcome();
-        }, 800);
+        setTimeout(function() { speakWelcome(); }, 800);
         {% endif %}
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -203,9 +164,7 @@
                 }, 5000);
             });
         });
-
-        console.log('%c 🎤 Voice Welcome System Loaded! ', 
-            'background: #6366f1; color: white; font-size: 14px; font-weight: bold; padding: 8px; border-radius: 5px;');
+        console.log('%c 🎤 Voice Welcome System Loaded! ', 'background: #6366f1; color: white; font-size: 14px; font-weight: bold; padding: 8px; border-radius: 5px;');
     </script>
 </body>
 </html>

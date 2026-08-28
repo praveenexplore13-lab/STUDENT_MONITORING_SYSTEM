@@ -6,22 +6,20 @@
     <title>Admin Notifications</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-    <!-- Dark Mode CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
 <body>
     <div class="admin-container">
         <nav class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-graduation-cap"></i>
-                <span>Admin Panel</span>
-            </div>
+            <div class="sidebar-brand"><i class="fas fa-graduation-cap"></i><span>Admin Panel</span></div>
             <ul class="sidebar-menu">
                 <li><a href="{{ url_for('admin.admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li><a href="{{ url_for('admin.admin_students') }}"><i class="fas fa-users"></i> Students</a></li>
                 <li><a href="{{ url_for('admin.admin_reports') }}"><i class="fas fa-chart-bar"></i> Reports</a></li>
                 <li class="active"><a href="{{ url_for('admin.admin_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="{{ url_for('admin.admin_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li><a href="{{ url_for('attendance_otp.admin_reports') }}"><i class="fas fa-file-alt"></i> Attendance Reports</a></li>
+                <li><a href="{{ url_for('attendance.admin_engagement') }}"><i class="fas fa-chart-line"></i> Engagement</a></li>
                 <li><a href="{{ url_for('admin.admin_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
                 <li><a href="{{ url_for('chat.admin_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -29,26 +27,15 @@
         </nav>
 
         <main class="main-content">
-            <header class="top-header">
-                <div class="header-left"><h1>Send Notifications</h1></div>
-                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
-            </header>
+            <header class="top-header"><div class="header-left"><h1>Send Notifications</h1></div><div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div></header>
 
             <div class="card">
                 <div class="card-header"><h3>📧 Send Notification to All Students</h3></div>
                 <div class="card-body">
                     <form method="POST">
-                        <div class="form-group">
-                            <label><i class="fas fa-heading"></i> Subject</label>
-                            <input type="text" name="subject" placeholder="Enter notification subject" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-comment"></i> Message</label>
-                            <textarea name="message" rows="5" placeholder="Enter your message here..." required></textarea>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> Send to All Students</button>
-                        </div>
+                        <div class="form-group"><label><i class="fas fa-heading"></i> Subject</label><input type="text" name="subject" placeholder="Enter notification subject" required></div>
+                        <div class="form-group"><label><i class="fas fa-comment"></i> Message</label><textarea name="message" rows="5" placeholder="Enter your message here..." required></textarea></div>
+                        <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> Send to All Students</button>
                     </form>
                 </div>
             </div>
@@ -59,10 +46,7 @@
                     {% if notifications %}
                         {% for notification in notifications %}
                         <div class="notification-item">
-                            <div class="notification-header">
-                                <strong>{{ notification.subject }}</strong>
-                                <span class="date">{{ notification.created_at }}</span>
-                            </div>
+                            <div class="notification-header"><strong>{{ notification.subject }}</strong><span class="date">{{ notification.created_at }}</span></div>
                             <p><small>From: {{ notification.sender_name }} ({{ notification.sender_role }})</small></p>
                             <p>{{ notification.message }}</p>
                             <form method="POST" action="{{ url_for('admin.admin_delete_notification', notification_id=notification.id) }}" style="display:inline;" onsubmit="return confirm('Delete this notification?')">
@@ -79,10 +63,7 @@
         </main>
     </div>
 
-    <!-- Chat Bubble -->
     {% include 'chat_bubble.html' %}
-
-    <!-- Theme Toggle Script -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
 </html>

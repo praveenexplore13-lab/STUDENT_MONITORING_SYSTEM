@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Attendance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+    <style>
+        .otp-input { 
+            width: 200px; 
+            padding: 15px; 
+            font-size: 32px; 
+            text-align: center; 
+            letter-spacing: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin: 20px auto;
+            display: block;
+        }
+        .otp-input:focus { border-color: #6366f1; outline: none; }
+        .status-box { padding: 20px; border-radius: 12px; text-align: center; margin-top: 20px; }
+        .status-success { background: #d1fae5; color: #065f46; }
+        .status-error { background: #fee2e2; color: #991b1b; }
+        .status-waiting { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+    <div class="student-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand"><i class="fas fa-user-graduate"></i><span>Student Panel</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
+                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
+                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
+                <li class="active"><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Attendance</a></li>
+                <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content" style="padding:20px;">
+            <h1>📋 Mark Attendance</h1>
+
+            <div class="card">
+                <div class="card-header"><h3>📝 Enter OTP</h3></div>
+                <div class="card-body" style="text-align:center;">
+                    <p style="color:#64748b;">Enter the 4-digit OTP provided by your mentor</p>
+                    <input type="text" id="otpInput" class="otp-input" maxlength="4" placeholder="0000">
+                    <button onclick="markAttendance()" class="btn btn-primary" style="padding:12px 40px;background:#6366f1;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;">
+                        <i class="fas fa-check"></i> Mark Attendance
+                    </button>
+                    <div id="statusMessage" style="margin-top:20px;"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3>📊 Your Attendance</h3></div>
+                <div class="card-body" id="attendanceInfo">
+                    <p style="color:#94a3b8;text-align:center;">Mark attendance to see your percentage</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentPercentage = 0;
+
+        function markAttendance() {
+            const otp = document.getElementById('otpInput').value.trim();
+            if (otp.length !== 4) {
+                showStatus('Please enter a valid 4-digit OTP', 'error');
+                return;
+            }
+
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = '<p style="color:#6366f1;">⏳ Checking OTP...</p>';
+
+            fetch('/attendance-otp/student/mark', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ otp: otp })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('✅ ' + data.message, 'success');
+                    currentPercentage = data.attendance_percentage;
+                    updateAttendanceInfo();
+                    document.getElementById('otpInput').value = '';
+                } else {
+                    showStatus('❌ ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showStatus('❌ Error connecting to server', 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function showStatus(message, type) {
+            const div = document.getElementById('statusMessage');
+            const classes = {
+                'success': 'status-box status-success',
+                'error': 'status-box status-error',
+                'waiting': 'status-box status-waiting'
+            };
+            div.className = classes[type] || classes.waiting;
+            div.innerHTML = message;
+        }
+
+        function updateAttendanceInfo() {
+            const div = document.getElementById('attendanceInfo');
+            div.innerHTML = `
+                <div style="text-align:center;padding:20px;">
+                    <h2 style="color:#6366f1;">${currentPercentage}%</h2>
+                    <p style="color:#64748b;">Your attendance percentage</p>
+                </div>
+            `;
+        }
+
+        // Auto-submit on Enter key
+        document.getElementById('otpInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                markAttendance();
+            }
+        });
+
+        // Only allow numbers
+        document.getElementById('otpInput').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 4);
+        });
+
+        // Focus on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('otpInput').focus();
+        });
+    </script>
+</body>
+</html>

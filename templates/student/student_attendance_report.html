@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Attendance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+    <style>
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .summary-item { text-align: center; padding: 15px; background: #f8fafc; border-radius: 8px; }
+        .summary-item h2 { font-size: 28px; margin: 0; }
+        .summary-item p { color: #64748b; margin: 5px 0; }
+        .attendance-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
+        .status-present { color: #10b981; }
+        .status-absent { color: #ef4444; }
+        @media (max-width: 600px) { .summary-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="student-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand"><i class="fas fa-user-graduate"></i><span>Student Panel</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
+                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
+                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
+                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark Attendance</a></li>
+                <li class="active"><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My Engagement</a></li>
+                <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content" style="padding:20px;">
+            <h1>📊 My Attendance Report</h1>
+
+            <div class="card">
+                <div class="card-header"><h3>📈 Summary</h3></div>
+                <div class="card-body">
+                    <div class="summary-grid">
+                        <div class="summary-item"><h2 style="color:#10b981;">{{ percentage }}%</h2><p>Overall Attendance</p></div>
+                        <div class="summary-item"><h2>{{ attendance|length }}</h2><p>Total Classes</p></div>
+                        <div class="summary-item"><h2>{{ attendance|selectattr('status', 'equalto', 'present')|list|length }}</h2><p>Present</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3>📋 Attendance Records</h3></div>
+                <div class="card-body">
+                    {% if attendance %}
+                        {% for record in attendance %}
+                        <div class="attendance-item">
+                            <div><strong>{{ record.subject }}</strong><p style="font-size:14px;color:#64748b;">{{ record.class_time }} | {{ record.location }}</p></div>
+                            <div>{% if record.status == 'present' %}<span class="status-present"><i class="fas fa-check-circle"></i> Present</span>{% else %}<span class="status-absent"><i class="fas fa-times-circle"></i> Absent</span>{% endif %}<p style="font-size:12px;color:#94a3b8;">{{ record.marked_at }}</p></div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="text-align:center;color:#94a3b8;padding:20px;">No attendance records found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {% include 'chat_bubble.html' %}
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>

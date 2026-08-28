@@ -6,7 +6,6 @@
     <title>Mentor Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mentor.css') }}">
-    <!-- Dark Mode CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
 <body>
@@ -21,6 +20,8 @@
                 <li><a href="{{ url_for('mentor.mentor_students') }}"><i class="fas fa-users"></i> Students</a></li>
                 <li><a href="{{ url_for('mentor.mentor_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="{{ url_for('mentor.mentor_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li><a href="{{ url_for('attendance_otp.mentor_attendance') }}"><i class="fas fa-qrcode"></i> Attendance</a></li>
+                <li><a href="{{ url_for('attendance.mentor_engagement') }}"><i class="fas fa-chart-line"></i> Engagement</a></li>
                 <li><a href="{{ url_for('mentor.mentor_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
                 <li><a href="{{ url_for('chat.mentor_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -98,12 +99,8 @@
         </main>
     </div>
 
-    <!-- Chat Bubble -->
     {% include 'chat_bubble.html' %}
-
-    <!-- Theme Toggle Script -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
-
     <script>
         setTimeout(function() {
             const msg = document.getElementById('voiceMessage').textContent;

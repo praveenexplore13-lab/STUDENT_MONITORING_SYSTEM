@@ -1,4 +1,4 @@
-﻿from flask import Flask, redirect, url_for, session
+from flask import Flask, redirect, url_for, session
 from config import Config
 from database import init_db
 
@@ -21,15 +21,19 @@ app.secret_key = Config.SECRET_KEY
 init_db()
 
 # Register all blueprints
-app.register_blueprint(auth_bp)
-app.register_blueprint(admin_bp)
-app.register_blueprint(mentor_bp)
-app.register_blueprint(student_bp)
-app.register_blueprint(chat_bp)
-app.register_blueprint(search_bp)
-app.register_blueprint(attendance_bp)
-app.register_blueprint(engagement_bp)
-app.register_blueprint(attendance_otp_bp)
+app.register_blueprint(auth_bp)              # Login/Register/OTP
+app.register_blueprint(admin_bp)             # Admin dashboard
+app.register_blueprint(mentor_bp)            # Mentor dashboard
+app.register_blueprint(student_bp)           # Student dashboard
+app.register_blueprint(chat_bp)              # AI Chatbot
+app.register_blueprint(search_bp)            # Global Search
+app.register_blueprint(attendance_bp)        # QR Attendance
+app.register_blueprint(engagement_bp)        # Engagement Analytics
+app.register_blueprint(attendance_otp_bp)    # OTP Attendance
+
+# ==========================================
+# ROOT ROUTE - Redirect to Login
+# ==========================================
 
 @app.route("/")
 def index():

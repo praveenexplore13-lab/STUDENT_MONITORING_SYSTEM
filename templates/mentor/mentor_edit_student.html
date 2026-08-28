@@ -6,21 +6,19 @@
     <title>Edit Student - Mentor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mentor.css') }}">
-    <!-- Dark Mode CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
 <body>
     <div class="mentor-container">
         <nav class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <span>Mentor Panel</span>
-            </div>
+            <div class="sidebar-brand"><i class="fas fa-chalkboard-teacher"></i><span>Mentor Panel</span></div>
             <ul class="sidebar-menu">
                 <li><a href="{{ url_for('mentor.mentor_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li class="active"><a href="{{ url_for('mentor.mentor_students') }}"><i class="fas fa-users"></i> Students</a></li>
                 <li><a href="{{ url_for('mentor.mentor_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="{{ url_for('mentor.mentor_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li><a href="{{ url_for('attendance_otp.mentor_attendance') }}"><i class="fas fa-qrcode"></i> Attendance</a></li>
+                <li><a href="{{ url_for('attendance.mentor_engagement') }}"><i class="fas fa-chart-line"></i> Engagement</a></li>
                 <li><a href="{{ url_for('mentor.mentor_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
                 <li><a href="{{ url_for('chat.mentor_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -28,64 +26,25 @@
         </nav>
 
         <main class="main-content">
-            <header class="top-header">
-                <div class="header-left"><h1>Edit Student</h1></div>
-                <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
-            </header>
+            <header class="top-header"><div class="header-left"><h1>Edit Student</h1></div><div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div></header>
 
             <div class="card">
                 <div class="card-header"><h2>Edit Profile - {{ student.name }}</h2></div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         <div class="form-grid">
-                            <div class="form-group">
-                                <label><i class="fas fa-id-card"></i> Roll Number</label>
-                                <input type="text" name="roll_number" value="{{ student.roll_number or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-building"></i> Department</label>
-                                <input type="text" name="department" value="{{ student.department or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Year</label>
-                                <input type="number" name="year" value="{{ student.year or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar-alt"></i> Semester</label>
-                                <input type="number" name="semester" value="{{ student.semester or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-star"></i> CGPA</label>
-                                <input type="number" step="0.01" name="cgpa" value="{{ student.cgpa or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-chart-line"></i> Attendance %</label>
-                                <input type="number" step="0.01" name="attendance_percentage" value="{{ student.attendance_percentage or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-file-alt"></i> Internal Marks</label>
-                                <input type="number" step="0.01" name="internal_marks" value="{{ student.internal_marks or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-tasks"></i> Assignments</label>
-                                <input type="number" name="assignments_submitted" value="{{ student.assignments_submitted or '' }}">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-tasks"></i> Total Assignments</label>
-                                <input type="number" name="total_assignments" value="{{ student.total_assignments or '' }}">
-                            </div>
-                            <div class="form-group full-width">
-                                <label><i class="fas fa-exclamation-triangle"></i> Disciplinary Notes</label>
-                                <textarea name="disciplinary_notes" rows="3">{{ student.disciplinary_notes or '' }}</textarea>
-                            </div>
-                            <div class="form-group full-width">
-                                <label><i class="fas fa-users"></i> Extracurricular</label>
-                                <textarea name="extracurricular" rows="2">{{ student.extracurricular or '' }}</textarea>
-                            </div>
-                            <div class="form-group full-width">
-                                <label><i class="fas fa-image"></i> Profile Image</label>
-                                <input type="file" name="profile_image" accept="image/*">
-                            </div>
+                            <div class="form-group"><label><i class="fas fa-id-card"></i> Roll Number</label><input type="text" name="roll_number" value="{{ student.roll_number or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-building"></i> Department</label><input type="text" name="department" value="{{ student.department or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-calendar"></i> Year</label><input type="number" name="year" value="{{ student.year or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Semester</label><input type="number" name="semester" value="{{ student.semester or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-star"></i> CGPA</label><input type="number" step="0.01" name="cgpa" value="{{ student.cgpa or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-chart-line"></i> Attendance %</label><input type="number" step="0.01" name="attendance_percentage" value="{{ student.attendance_percentage or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-file-alt"></i> Internal Marks</label><input type="number" step="0.01" name="internal_marks" value="{{ student.internal_marks or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-tasks"></i> Assignments</label><input type="number" name="assignments_submitted" value="{{ student.assignments_submitted or '' }}"></div>
+                            <div class="form-group"><label><i class="fas fa-tasks"></i> Total Assignments</label><input type="number" name="total_assignments" value="{{ student.total_assignments or '' }}"></div>
+                            <div class="form-group full-width"><label><i class="fas fa-exclamation-triangle"></i> Disciplinary Notes</label><textarea name="disciplinary_notes" rows="3">{{ student.disciplinary_notes or '' }}</textarea></div>
+                            <div class="form-group full-width"><label><i class="fas fa-users"></i> Extracurricular</label><textarea name="extracurricular" rows="2">{{ student.extracurricular or '' }}</textarea></div>
+                            <div class="form-group full-width"><label><i class="fas fa-image"></i> Profile Image</label><input type="file" name="profile_image" accept="image/*"></div>
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Update</button>
@@ -97,10 +56,7 @@
         </main>
     </div>
 
-    <!-- Chat Bubble -->
     {% include 'chat_bubble.html' %}
-
-    <!-- Theme Toggle Script -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
 </html>

@@ -15,7 +15,7 @@ class Config:
     # Database settings
     DB_HOST = os.getenv('DB_HOST', 'localhost')
     DB_USER = os.getenv('DB_USER', 'root')
-    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', 'Praveen2007')
     DB_NAME = os.getenv('DB_NAME', 'login_otp_db')
     
     # Gmail settings (for notifications)
@@ -24,6 +24,12 @@ class Config:
     
     # Google Client ID
     GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
+    
+    # ==========================================
+    # GEMINI AI CONFIGURATION
+    # ==========================================
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
+    GEMINI_MODEL = 'models/gemini-1.5-flash'  # or 'models/gemini-1.5-pro'
     
     # Upload settings
     UPLOAD_FOLDER = "static/uploads/profiles"

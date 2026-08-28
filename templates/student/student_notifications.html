@@ -6,16 +6,12 @@
     <title>Notifications - Student</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
-    <!-- Dark Mode CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
 <body>
     <div class="student-container">
         <nav class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-user-graduate"></i>
-                <span>Student Panel</span>
-            </div>
+            <div class="sidebar-brand"><i class="fas fa-user-graduate"></i><span>Student Panel</span></div>
             <ul class="sidebar-menu">
                 <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
@@ -24,6 +20,9 @@
                 <li class="active"><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
                 <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
+                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My Engagement</a></li>
                 <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
@@ -66,10 +65,7 @@
         </main>
     </div>
 
-    <!-- Chat Bubble -->
     {% include 'chat_bubble.html' %}
-
-    <!-- Theme Toggle Script -->
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
 </html>
