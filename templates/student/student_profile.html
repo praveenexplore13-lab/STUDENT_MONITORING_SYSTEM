@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,72 +9,99 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
 </head>
+
 <body>
     <div class="student-container">
         <nav class="sidebar">
             <div class="sidebar-brand"><i class="fas fa-user-graduate"></i><span>Student Panel</span></div>
             <ul class="sidebar-menu">
                 <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li class="active"><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
-                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
-                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
-                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
-                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark Attendance</a></li>
-                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My Attendance</a></li>
-                <li><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My Engagement</a></li>
+                <li class="active"><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i>
+                        Profile</a></li>
+                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a>
+                </li>
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a>
+                </li>
+                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i>
+                        Notifications</a></li>
+                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD
+                        Request</a></li>
+                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a>
+                </li>
+                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark
+                        Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My
+                        Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My
+                        Engagement</a></li>
                 <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li>
+                    <a href="{{ url_for('ai_tools.ai_tools') }}">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Tools</span>
+                    </a>
+                </li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
 
         <main class="main-content">
             <header class="top-header">
-                <div class="header-left"><h1>My Profile</h1></div>
+                <div class="header-left">
+                    <h1>My Profile</h1>
+                </div>
                 <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
             </header>
 
             <div class="profile-card">
                 <div class="profile-avatar-large">
                     {% if student and student.profile_image %}
-                        <img src="{{ url_for('static', filename=student.profile_image) }}" alt="Profile">
+                    <img src="{{ url_for('static', filename=student.profile_image) }}" alt="Profile">
                     {% else %}
-                        <i class="fas fa-user-circle"></i>
+                    <i class="fas fa-user-circle"></i>
                     {% endif %}
                 </div>
                 <h2>{{ name }}</h2>
                 <p><i class="fas fa-envelope"></i> {{ session.user_email }}</p>
 
                 <div class="profile-details">
-                    <div class="detail-row"><span>Roll Number:</span><span>{{ student.roll_number or 'Not set' }}</span></div>
-                    <div class="detail-row"><span>Department:</span><span>{{ student.department or 'Not set' }}</span></div>
+                    <div class="detail-row"><span>Roll Number:</span><span>{{ student.roll_number or 'Not set' }}</span>
+                    </div>
+                    <div class="detail-row"><span>Department:</span><span>{{ student.department or 'Not set' }}</span>
+                    </div>
                     <div class="detail-row"><span>Year:</span><span>{{ student.year or 'Not set' }}</span></div>
                     <div class="detail-row"><span>Semester:</span><span>{{ student.semester or 'Not set' }}</span></div>
                     <div class="detail-row"><span>CGPA:</span><span>{{ student.cgpa or 'Not set' }}</span></div>
-                    <div class="detail-row"><span>Attendance:</span><span>{{ student.attendance_percentage or 'Not set' }}%</span></div>
-                    <div class="detail-row"><span>Internal Marks:</span><span>{{ student.internal_marks or 'Not set' }}</span></div>
-                    <div class="detail-row"><span>Assignments:</span><span>{{ student.assignments_submitted or '0' }}/{{ student.total_assignments or '0' }}</span></div>
-                    <div class="detail-row"><span>Disciplinary Notes:</span><span>{{ student.disciplinary_notes or 'None' }}</span></div>
-                    <div class="detail-row"><span>Extracurricular:</span><span>{{ student.extracurricular or 'None' }}</span></div>
+                    <div class="detail-row"><span>Attendance:</span><span>{{ student.attendance_percentage or 'Not set'
+                            }}%</span></div>
+                    <div class="detail-row"><span>Internal Marks:</span><span>{{ student.internal_marks or 'Not set'
+                            }}</span></div>
+                    <div class="detail-row"><span>Assignments:</span><span>{{ student.assignments_submitted or '0' }}/{{
+                            student.total_assignments or '0' }}</span></div>
+                    <div class="detail-row"><span>Disciplinary Notes:</span><span>{{ student.disciplinary_notes or
+                            'None' }}</span></div>
+                    <div class="detail-row"><span>Extracurricular:</span><span>{{ student.extracurricular or 'None'
+                            }}</span></div>
                     {% if student and student.risk %}
                     <div class="detail-row"><span>Risk Level:</span>
                         <span>
                             {% if student.risk.risk_level == 'high' %}
-                                <span class="badge red">🔴 High</span>
+                            <span class="badge red">🔴 High</span>
                             {% elif student.risk.risk_level == 'medium' %}
-                                <span class="badge yellow">🟡 Medium</span>
+                            <span class="badge yellow">🟡 Medium</span>
                             {% else %}
-                                <span class="badge green">🟢 Low</span>
+                            <span class="badge green">🟢 Low</span>
                             {% endif %}
                         </span>
                     </div>
-                    <div class="detail-row"><span>Risk Factors:</span><span>{{ student.risk.risk_factors or 'None' }}</span></div>
+                    <div class="detail-row"><span>Risk Factors:</span><span>{{ student.risk.risk_factors or 'None'
+                            }}</span></div>
                     {% endif %}
                 </div>
 
                 <div class="profile-actions">
-                    <a href="{{ url_for('student.student_edit_profile') }}" class="btn-primary"><i class="fas fa-edit"></i> Edit Profile</a>
+                    <a href="{{ url_for('student.student_edit_profile') }}" class="btn-primary"><i
+                            class="fas fa-edit"></i> Edit Profile</a>
                 </div>
             </div>
         </main>
@@ -82,4 +110,5 @@
     {% include 'chat_bubble.html' %}
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
+
 </html>

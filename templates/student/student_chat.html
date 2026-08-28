@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,24 +15,27 @@
             gap: 20px;
             padding: 20px;
         }
+
         .profile-sidebar {
             width: 320px;
             background: white;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             overflow-y: auto;
             flex-shrink: 0;
         }
+
         .chat-main {
             flex: 1;
             background: white;
             border-radius: 16px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
+
         .chat-messages {
             flex: 1;
             padding: 20px;
@@ -39,6 +43,7 @@
             min-height: 400px;
             max-height: 500px;
         }
+
         .chat-input-area {
             display: flex;
             gap: 10px;
@@ -47,6 +52,7 @@
             align-items: center;
             flex-shrink: 0;
         }
+
         .chat-input-area input {
             flex: 1;
             padding: 10px 14px;
@@ -55,9 +61,11 @@
             font-size: 14px;
             outline: none;
         }
+
         .chat-input-area input:focus {
             border-color: #6366f1;
         }
+
         .chat-input-area button {
             padding: 10px 20px;
             background: #6366f1;
@@ -67,15 +75,19 @@
             cursor: pointer;
             font-weight: 600;
         }
+
         .chat-input-area button:hover {
             background: #4f46e5;
         }
+
         .message {
             margin-bottom: 15px;
         }
+
         .message.user {
             text-align: right;
         }
+
         .message-content {
             display: inline-block;
             padding: 10px 16px;
@@ -86,22 +98,35 @@
             line-height: 1.6;
             text-align: left;
         }
+
         .message.user .message-content {
             background: #6366f1;
             color: white;
         }
+
         .message.ai .message-content {
             background: #f1f5f9;
             color: #1a1a2e;
         }
+
         .stat-item {
             display: flex;
             justify-content: space-between;
             padding: 6px 0;
             border-bottom: 1px solid #f1f5f9;
         }
-        .stat-label { color: #64748b; font-size: 13px; }
-        .stat-value { font-weight: 600; font-size: 13px; color: #1a1a2e; }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a1a2e;
+        }
+
         .profile-avatar {
             width: 60px;
             height: 60px;
@@ -115,56 +140,208 @@
             margin: 0 auto 10px;
             overflow: hidden;
         }
-        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-name { text-align: center; }
-        .profile-name h2 { font-size: 18px; color: #1a1a2e; margin-bottom: 2px; }
-        .profile-name p { font-size: 13px; color: #64748b; }
-        .role-badge { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #2563eb; }
-        .upload-btn-wrapper { position: relative; overflow: hidden; display: inline-block; }
-        .upload-btn { padding: 8px 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; }
-        .upload-btn:hover { background: #cbd5e1; }
-        .upload-btn-wrapper input[type=file] { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .file-preview { display: none; padding: 8px 15px; background: #f1f5f9; border-radius: 8px; margin: 5px 20px; align-items: center; gap: 10px; flex-shrink: 0; }
-        .file-preview.show { display: flex; }
-        .remove-file { background: none; border: none; color: #ef4444; cursor: pointer; }
-        
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            text-align: center;
+        }
+
+        .profile-name h2 {
+            font-size: 18px;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+
+        .profile-name p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .upload-btn {
+            padding: 8px 12px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .upload-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .upload-btn-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-preview {
+            display: none;
+            padding: 8px 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin: 5px 20px;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .file-preview.show {
+            display: flex;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+        }
+
         /* Dark Mode */
-        body.dark-mode .profile-sidebar { background: #1a1a2e; }
-        body.dark-mode .chat-main { background: #1a1a2e; }
-        body.dark-mode .stat-value { color: #e2e8f0; }
-        body.dark-mode .chat-input-area { border-top-color: rgba(255,255,255,0.05); }
-        body.dark-mode .chat-input-area input { background: #0f0f1a; color: #e2e8f0; border-color: rgba(255,255,255,0.1); }
-        body.dark-mode .message.ai .message-content { background: #0f0f1a; color: #e2e8f0; }
-        body.dark-mode .stat-item { border-bottom-color: rgba(255,255,255,0.05); }
-        body.dark-mode .profile-name h2 { color: #e2e8f0; }
-        
+        body.dark-mode .profile-sidebar {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .chat-main {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .stat-value {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .chat-input-area {
+            border-top-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .chat-input-area input {
+            background: #0f0f1a;
+            color: #e2e8f0;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .message.ai .message-content {
+            background: #0f0f1a;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .stat-item {
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .profile-name h2 {
+            color: #e2e8f0;
+        }
+
         @media (max-width: 768px) {
-            .chat-container { flex-direction: column; height: auto; }
-            .profile-sidebar { width: 100%; max-height: 300px; }
-            .chat-messages { min-height: 200px; max-height: 300px; }
+            .chat-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .profile-sidebar {
+                width: 100%;
+                max-height: 300px;
+            }
+
+            .chat-messages {
+                min-height: 200px;
+                max-height: 300px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="student-container">
         <!-- Sidebar -->
         <nav class="sidebar">
             <div class="sidebar-brand">
-                <i class="fas fa-user-graduate"></i>
-                <span>Student Panel</span>
+                <i class="fas fa-graduation-cap"></i>
+                <span>Student Portal</span>
             </div>
+
             <ul class="sidebar-menu">
-                <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
-                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
-                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
-                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
-                <li class="active"><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
-                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Attendance</a></li>
-    </ul>
+
+                <li>
+                    <a href="{{ url_for('student.student_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('student.student_profile') }}">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                </li>
+
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('attendance_otp.student_attendance') }}">
+                        <i class="fas fa-qrcode"></i> Mark Attendance
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('attendance.student_attendance_report') }}">
+                        <i class="fas fa-clock"></i> My Attendance
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('attendance.student_engagement') }}">
+                        <i class="fas fa-chart-line"></i> My Engagement
+                    </a>
+                </li>
+
+                <!-- Current page -->
+                <li class="active">
+                    <a href="{{ url_for('chat.student_chat') }}">
+                        <i class="fas fa-robot"></i> AI Chatbot
+                    </a>
+                </li>
+
+                <!-- AI Tools -->
+                <li>
+                    <a href="{{ url_for('ai_tools.ai_tools') }}">
+                        <i class="fas fa-brain"></i> AI Tools
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('auth.logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+
+            </ul>
         </nav>
 
         <!-- Main Content -->
@@ -174,9 +351,9 @@
                 <div class="profile-sidebar">
                     <div class="profile-avatar">
                         {% if student and student.profile_image %}
-                            <img src="{{ url_for('static', filename=student.profile_image) }}" alt="Profile">
+                        <img src="{{ url_for('static', filename=student.profile_image) }}" alt="Profile">
                         {% else %}
-                            <i class="fas fa-user-circle"></i>
+                        <i class="fas fa-user-circle"></i>
                         {% endif %}
                     </div>
                     <div class="profile-name">
@@ -187,18 +364,28 @@
                     <hr style="margin:15px 0;">
                     <div class="profile-stats">
                         {% if student %}
-                            <div class="stat-item"><span class="stat-label">Roll Number</span><span class="stat-value">{{ student.roll_number or 'Not set' }}</span></div>
-                            <div class="stat-item"><span class="stat-label">Department</span><span class="stat-value">{{ student.department or 'Not set' }}</span></div>
-                            <div class="stat-item"><span class="stat-label">CGPA</span><span class="stat-value">{{ student.cgpa or 'Not set' }}</span></div>
-                            <div class="stat-item"><span class="stat-label">Attendance</span><span class="stat-value">{{ student.attendance_percentage or 'Not set' }}%</span></div>
-                            <div class="stat-item"><span class="stat-label">Internal Marks</span><span class="stat-value">{{ student.internal_marks or 'Not set' }}</span></div>
-                            <div class="stat-item"><span class="stat-label">Assignments</span><span class="stat-value">{{ student.assignments_submitted or '0' }}/{{ student.total_assignments or '0' }}</span></div>
-                            {% if student.risk %}
-                                <div class="stat-item"><span class="stat-label">Risk Level</span><span class="stat-value" style="color:{% if student.risk.risk_level == 'high' %}#ef4444{% elif student.risk.risk_level == 'medium' %}#f59e0b{% else %}#10b981{% endif %};font-weight:bold;">{{ student.risk.risk_level.upper() }}</span></div>
-                                <div class="stat-item"><span class="stat-label">Risk Factors</span><span class="stat-value">{{ student.risk.risk_factors or 'None' }}</span></div>
-                            {% endif %}
+                        <div class="stat-item"><span class="stat-label">Roll Number</span><span class="stat-value">{{
+                                student.roll_number or 'Not set' }}</span></div>
+                        <div class="stat-item"><span class="stat-label">Department</span><span class="stat-value">{{
+                                student.department or 'Not set' }}</span></div>
+                        <div class="stat-item"><span class="stat-label">CGPA</span><span class="stat-value">{{
+                                student.cgpa or 'Not set' }}</span></div>
+                        <div class="stat-item"><span class="stat-label">Attendance</span><span class="stat-value">{{
+                                student.attendance_percentage or 'Not set' }}%</span></div>
+                        <div class="stat-item"><span class="stat-label">Internal Marks</span><span class="stat-value">{{
+                                student.internal_marks or 'Not set' }}</span></div>
+                        <div class="stat-item"><span class="stat-label">Assignments</span><span class="stat-value">{{
+                                student.assignments_submitted or '0' }}/{{ student.total_assignments or '0' }}</span>
+                        </div>
+                        {% if student.risk %}
+                        <div class="stat-item"><span class="stat-label">Risk Level</span><span class="stat-value"
+                                style="color:{% if student.risk.risk_level == 'high' %}#ef4444{% elif student.risk.risk_level == 'medium' %}#f59e0b{% else %}#10b981{% endif %};font-weight:bold;">{{
+                                student.risk.risk_level.upper() }}</span></div>
+                        <div class="stat-item"><span class="stat-label">Risk Factors</span><span class="stat-value">{{
+                                student.risk.risk_factors or 'None' }}</span></div>
+                        {% endif %}
                         {% else %}
-                            <p style="text-align:center;color:#94a3b8;padding:20px 0;">Complete your profile to see data</p>
+                        <p style="text-align:center;color:#94a3b8;padding:20px 0;">Complete your profile to see data</p>
                         {% endif %}
                     </div>
                 </div>
@@ -207,10 +394,12 @@
                 <div class="chat-main">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message ai">
-                            <div class="message-content">👋 Hello {{ name }}! I'm your AI Assistant. I can analyze your profile data, explain your risk level, and give personalized advice. Ask me anything!</div>
+                            <div class="message-content">👋 Hello {{ name }}! I'm your AI Assistant. I can analyze your
+                                profile data, explain your risk level, and give personalized advice. Ask me anything!
+                            </div>
                         </div>
                     </div>
-                    
+
                     <!-- File Preview -->
                     <div class="file-preview" id="filePreview">
                         <i class="fas fa-file"></i>
@@ -236,7 +425,7 @@
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const chatInput = document.getElementById('chatInput');
             const sendBtn = document.getElementById('sendBtn');
             const messagesContainer = document.getElementById('chatMessages');
@@ -281,24 +470,24 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
-                .then(data => {
-                    removeTypingIndicator(typingId);
-                    const reply = data.reply || 'Sorry, I could not process your request.';
-                    addMessage(reply, 'ai');
-                    chatInput.disabled = false;
-                    sendBtn.disabled = false;
-                    chatInput.focus();
-                    scrollToBottom();
-                    removeFile();
-                })
-                .catch(error => {
-                    removeTypingIndicator(typingId);
-                    addMessage('❌ Sorry, I encountered an error. Please try again.', 'ai');
-                    chatInput.disabled = false;
-                    sendBtn.disabled = false;
-                    console.error('Chat error:', error);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        removeTypingIndicator(typingId);
+                        const reply = data.reply || 'Sorry, I could not process your request.';
+                        addMessage(reply, 'ai');
+                        chatInput.disabled = false;
+                        sendBtn.disabled = false;
+                        chatInput.focus();
+                        scrollToBottom();
+                        removeFile();
+                    })
+                    .catch(error => {
+                        removeTypingIndicator(typingId);
+                        addMessage('❌ Sorry, I encountered an error. Please try again.', 'ai');
+                        chatInput.disabled = false;
+                        sendBtn.disabled = false;
+                        console.error('Chat error:', error);
+                    });
             }
 
             // ==========================================
@@ -351,7 +540,7 @@
                 filePreview.classList.remove('show');
             }
 
-            fileInput.addEventListener('change', function() {
+            fileInput.addEventListener('change', function () {
                 if (this.files && this.files.length > 0) {
                     selectedFile = this.files[0];
                     fileName.textContent = selectedFile.name;
@@ -364,7 +553,7 @@
             // ==========================================
             sendBtn.addEventListener('click', sendMessage);
 
-            chatInput.addEventListener('keypress', function(e) {
+            chatInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
@@ -374,7 +563,7 @@
             // ==========================================
             // KEYBOARD SHORTCUT: Ctrl+Shift+C
             // ==========================================
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 if (e.ctrlKey && e.shiftKey && (e.key === 'c' || e.key === 'C')) {
                     e.preventDefault();
                     chatInput.focus();
@@ -389,4 +578,5 @@
         });
     </script>
 </body>
+
 </html>

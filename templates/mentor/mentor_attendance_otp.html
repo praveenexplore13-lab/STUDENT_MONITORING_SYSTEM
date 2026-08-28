@@ -8,26 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mentor.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
     <style>
-        .otp-box {
-            border: 3px solid #10b981;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            margin: 20px 0;
-            background: #f0fdf4;
-        }
-        .otp-box .big-otp {
-            font-size: 72px;
-            font-weight: bold;
-            color: #10b981;
-            letter-spacing: 15px;
-            font-family: monospace;
-        }
-        .otp-box .hint {
-            color: #64748b;
-            font-size: 14px;
-            margin-top: 10px;
-        }
         .btn-start {
             background: #10b981;
             color: white;
@@ -61,6 +41,41 @@
         .btn-close:hover {
             background: #dc2626;
         }
+        .btn-force-close {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .btn-force-close:hover {
+            background: #b91c1c;
+        }
+        .otp-box {
+            border: 3px solid #10b981;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+            background: #f0fdf4;
+        }
+        .otp-box .big-otp {
+            font-size: 72px;
+            font-weight: bold;
+            color: #10b981;
+            letter-spacing: 15px;
+            font-family: monospace;
+        }
+        .otp-box .hint {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 10px;
+        }
         .active-session {
             border: 2px solid #10b981;
             background: #f0fdf4;
@@ -72,40 +87,50 @@
             color: #10b981;
             font-weight: 600;
         }
-        .live-count {
-            text-align: center;
-            padding: 10px;
+        .student-attendance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            background: #f8fafc;
+        }
+        .student-attendance-item.present {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+        .student-attendance-item.absent {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        .student-attendance-item.waiting {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        .student-name { font-weight: 600; }
+        .student-roll { color: #64748b; font-size: 13px; }
+        .student-status { font-weight: 600; font-size: 13px; }
+        .student-status.present { color: #10b981; }
+        .student-status.absent { color: #ef4444; }
+        .student-status.waiting { color: #f59e0b; }
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
             background: #f8fafc;
             border-radius: 8px;
             margin: 10px 0;
         }
-        .student-item {
-            padding: 8px 14px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        .student-present {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        .student-absent {
-            background: #f1f5f9;
-            color: #64748b;
-        }
-        .class-select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
+        .stats-row .stat-item { text-align: center; }
+        .stats-row .stat-item .num { font-size: 24px; font-weight: bold; }
+        .stats-row .stat-item .label { color: #64748b; font-size: 14px; }
+        .stats-row .stat-item .num.present { color: #10b981; }
+        .stats-row .stat-item .num.absent { color: #ef4444; }
+        .stats-row .stat-item .num.total { color: #6366f1; }
         @media (max-width: 600px) {
             .otp-box .big-otp { font-size: 48px; }
+            .student-attendance-item { flex-wrap: wrap; gap: 5px; }
         }
     </style>
 </head>
@@ -119,7 +144,8 @@
                 <li><a href="{{ url_for('mentor.mentor_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
                 <li><a href="{{ url_for('mentor.mentor_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
                 <li class="active"><a href="{{ url_for('attendance_otp.mentor_attendance') }}"><i class="fas fa-qrcode"></i> Attendance</a></li>
-                <li><a href="{{ url_for('attendance.mentor_engagement') }}"><i class="fas fa-chart-line"></i> Engagement</a></li>
+                <li><a href="{{ url_for('attendance_otp.mentor_attendance_history') }}"><i class="fas fa-history"></i> History</a></li>
+                
                 <li><a href="{{ url_for('mentor.mentor_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
                 <li><a href="{{ url_for('chat.mentor_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -129,7 +155,6 @@
         <main class="main-content" style="padding:20px;">
             <h1>📋 Attendance Management</h1>
 
-            <!-- Start Attendance Button -->
             <div class="card">
                 <div class="card-body">
                     <button onclick="startAttendance()" class="btn-start" id="startBtn">
@@ -138,7 +163,6 @@
                 </div>
             </div>
 
-            <!-- Active Session - OTP Display -->
             {% if active_session %}
             <div class="active-session">
                 <div class="otp-box">
@@ -148,37 +172,50 @@
                     <p class="hint">✅ Correct OTP = Present | ❌ Wrong OTP = Absent</p>
                 </div>
 
-                <div class="live-count">
-                    <strong>👥 Total Students: </strong>
-                    <span id="totalCount">{{ active_session.total_present + active_session.total_absent if active_session.total_present and active_session.total_absent else students|length }}</span>
-                    <strong> | ✅ Present: </strong>
-                    <span id="presentCount">{{ active_session.total_present or 0 }}</span>
-                    <strong> | ❌ Absent: </strong>
-                    <span id="absentCount">{{ active_session.total_absent or 0 }}</span>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="num total">{{ students|length }}</div>
+                        <div class="label">Total Students</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num present">{{ active_session.total_present or 0 }}</div>
+                        <div class="label">✅ Present</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="num absent">{{ active_session.total_absent or 0 }}</div>
+                        <div class="label">❌ Absent</div>
+                    </div>
                 </div>
 
                 <button onclick="closeAttendance({{ active_session.id }})" class="btn-close">
                     <i class="fas fa-times"></i> Close Attendance
                 </button>
+
+                <button onclick="forceCloseAttendance()" class="btn-force-close">
+                    <i class="fas fa-exclamation-triangle"></i> Force Close (if stuck)
+                </button>
             </div>
             {% endif %}
 
-            <!-- Student Attendance List -->
             <div class="card">
                 <div class="card-header"><h3>📊 Student Attendance</h3></div>
                 <div class="card-body" id="attendanceList">
-                    {% if active_session and students %}
+                    {% if students %}
                         {% for student in students %}
-                        <div class="student-item student-absent" id="student-{{ student.id }}">
-                            <span>{{ student.name }}</span>
-                            <span>{{ student.roll_number or 'N/A' }}</span>
-                            <span id="status-{{ student.id }}">⏳ Waiting</span>
+                        <div class="student-attendance-item waiting" id="student-{{ student.id }}">
+                            <div>
+                                <span class="student-name">{{ student.name }}</span>
+                                <span class="student-roll">({{ student.roll_number or 'N/A' }})</span>
+                            </div>
+                            <div>
+                                <span class="student-status waiting" id="status-{{ student.id }}">
+                                    ⏳ Waiting
+                                </span>
+                            </div>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <p style="color:#94a3b8;text-align:center;padding:20px;">
-                            Start attendance to begin
-                        </p>
+                        <p style="text-align:center;color:#94a3b8;padding:20px;">No students found.</p>
                     {% endif %}
                 </div>
             </div>
@@ -186,9 +223,6 @@
     </div>
 
     <script>
-        // ==========================================
-        // START ATTENDANCE
-        // ==========================================
         function startAttendance() {
             const btn = document.getElementById('startBtn');
             btn.disabled = true;
@@ -197,7 +231,7 @@
             fetch('/attendance-otp/mentor/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ class_id: 1 })  // Default class
+                body: JSON.stringify({ class_id: 1 })
             })
             .then(response => response.json())
             .then(data => {
@@ -218,11 +252,8 @@
             });
         }
 
-        // ==========================================
-        // CLOSE ATTENDANCE
-        // ==========================================
         function closeAttendance(sessionId) {
-            if (!confirm('⚠️ Close attendance?')) {
+            if (!confirm('⚠️ Close attendance? This will mark all unmarked students as absent.')) {
                 return;
             }
 
@@ -233,7 +264,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('✅ Attendance closed!');
+                    alert('✅ Attendance closed!\n\n✅ Present: ' + data.total_present + '\n❌ Absent: ' + data.total_absent);
                     location.reload();
                 } else {
                     alert('❌ Error: ' + data.error);
@@ -245,31 +276,55 @@
             });
         }
 
-        // ==========================================
-        // LIVE ATTENDANCE UPDATE (Polling)
-        // ==========================================
+        function forceCloseAttendance() {
+            if (!confirm('⚠️ Force close ALL active sessions? This will mark all unmarked students as absent.')) {
+                return;
+            }
+
+            fetch('/attendance-otp/mentor/force-close', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ ' + data.message);
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('❌ Error connecting to server');
+                console.error('Error:', error);
+            });
+        }
+
         {% if active_session %}
         function updateLiveAttendance() {
             fetch('/attendance-otp/mentor/live/' + {{ active_session.id }})
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update counts
-                    document.getElementById('presentCount').textContent = data.present;
-                    document.getElementById('absentCount').textContent = data.absent;
-                    document.getElementById('totalCount').textContent = data.total || data.present + data.absent;
+                    document.querySelector('.stats-row .stat-item .num.present').textContent = data.present;
+                    document.querySelector('.stats-row .stat-item .num.absent').textContent = data.absent;
 
-                    // Update student status
                     data.students.forEach(student => {
                         const statusEl = document.getElementById('status-' + student.id);
                         const rowEl = document.getElementById('student-' + student.id);
                         if (statusEl && rowEl) {
                             if (student.status === 'present') {
                                 statusEl.textContent = '✅ Present';
-                                rowEl.className = 'student-item student-present';
+                                statusEl.className = 'student-status present';
+                                rowEl.className = 'student-attendance-item present';
+                            } else if (student.status === 'absent') {
+                                statusEl.textContent = '❌ Absent';
+                                statusEl.className = 'student-status absent';
+                                rowEl.className = 'student-attendance-item absent';
                             } else {
-                                statusEl.textContent = '⏳ Absent';
-                                rowEl.className = 'student-item student-absent';
+                                statusEl.textContent = '⏳ Waiting';
+                                statusEl.className = 'student-status waiting';
+                                rowEl.className = 'student-attendance-item waiting';
                             }
                         }
                     });
@@ -278,7 +333,6 @@
             .catch(error => console.error('Error updating live attendance:', error));
         }
 
-        // Update every 3 seconds
         setInterval(updateLiveAttendance, 3000);
         setTimeout(updateLiveAttendance, 500);
         {% endif %}

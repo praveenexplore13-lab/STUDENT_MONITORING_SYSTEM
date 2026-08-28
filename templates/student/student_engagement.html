@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +9,56 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
     <style>
-        .score-circle { width: 150px; height: 150px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: white; }
-        .score-high { background: #10b981; }
-        .score-medium { background: #f59e0b; }
-        .score-low { background: #f97316; }
-        .score-critical { background: #ef4444; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .recommendation { padding: 10px; border-left: 4px solid #6366f1; margin-bottom: 10px; background: #f8fafc; }
-        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .score-high {
+            background: #10b981;
+        }
+
+        .score-medium {
+            background: #f59e0b;
+        }
+
+        .score-low {
+            background: #f97316;
+        }
+
+        .score-critical {
+            background: #ef4444;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .recommendation {
+            padding: 10px;
+            border-left: 4px solid #6366f1;
+            margin-bottom: 10px;
+            background: #f8fafc;
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="student-container">
         <nav class="sidebar">
@@ -25,15 +66,29 @@
             <ul class="sidebar-menu">
                 <li><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
-                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
-                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
-                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
-                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark Attendance</a></li>
-                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My Attendance</a></li>
-                <li class="active"><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My Engagement</a></li>
+                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a>
+                </li>
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a>
+                </li>
+                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i>
+                        Notifications</a></li>
+                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD
+                        Request</a></li>
+                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a>
+                </li>
+                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark
+                        Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My
+                        Attendance</a></li>
+                <li class="active"><a href="{{ url_for('attendance.student_engagement') }}"><i
+                            class="fas fa-chart-line"></i> My Engagement</a></li>
                 <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li>
+                    <a href="{{ url_for('ai_tools.ai_tools') }}">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Tools</span>
+                    </a>
+                </li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
@@ -43,7 +98,8 @@
 
             <div class="card">
                 <div class="card-body" style="text-align:center;">
-                    <div class="score-circle {% if engagement.level == 'high' %}score-high{% elif engagement.level == 'medium' %}score-medium{% elif engagement.level == 'low' %}score-low{% else %}score-critical{% endif %}">
+                    <div
+                        class="score-circle {% if engagement.level == 'high' %}score-high{% elif engagement.level == 'medium' %}score-medium{% elif engagement.level == 'low' %}score-low{% else %}score-critical{% endif %}">
                         {{ engagement.score }}%
                     </div>
                     <h3>{{ engagement.level_text }}</h3>
@@ -52,26 +108,44 @@
             </div>
 
             <div class="grid-2">
-                <div class="card"><div class="card-header"><h3>📊 Engagement Details</h3></div><div class="card-body">
-                    <p><strong>Attendance:</strong> {{ engagement.attendance }}%</p>
-                    <p><strong>Mentor Notes:</strong> {{ engagement.notes_count }}</p>
-                    <p><strong>Assignments:</strong> {{ engagement.assignments.submitted }}/{{ engagement.assignments.total }}</p>
-                </div></div>
-                <div class="card"><div class="card-header"><h3>🔮 Prediction</h3></div><div class="card-body">
-                    <p>{{ prediction.prediction }}</p>
-                    <p><strong>Risk Level:</strong> {% if prediction.risk == 'high' %}🔴 High{% elif prediction.risk == 'medium' %}🟡 Medium{% else %}🟢 Low{% endif %}</p>
-                </div></div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📊 Engagement Details</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Attendance:</strong> {{ engagement.attendance }}%</p>
+                        <p><strong>Mentor Notes:</strong> {{ engagement.notes_count }}</p>
+                        <p><strong>Assignments:</strong> {{ engagement.assignments.submitted }}/{{
+                            engagement.assignments.total }}</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔮 Prediction</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ prediction.prediction }}</p>
+                        <p><strong>Risk Level:</strong> {% if prediction.risk == 'high' %}🔴 High{% elif prediction.risk
+                            == 'medium' %}🟡 Medium{% else %}🟢 Low{% endif %}</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="card"><div class="card-header"><h3>💡 Recommendations</h3></div><div class="card-body">
-                {% for rec in engagement.recommendations %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>💡 Recommendations</h3>
+                </div>
+                <div class="card-body">
+                    {% for rec in engagement.recommendations %}
                     <div class="recommendation">{{ rec|safe }}</div>
-                {% endfor %}
-            </div></div>
+                    {% endfor %}
+                </div>
+            </div>
         </main>
     </div>
 
     {% include 'chat_bubble.html' %}
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>
+
 </html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quanta AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/ai_tools.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_tools_fix.css') }}" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="{{ url_for('static', filename='js/ai_tools.js') }}"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><span class="brand-mark">✦</span><div><strong>Quanta AI</strong><small>Knowledge Assistant</small></div></div>
+      <button class="new-chat" id="newChat">＋ New conversation</button>
+      <section class="history"><span class="section-label">Chat history</span><div id="chatHistory"><p class="empty-note">No conversations yet</p></div></section>
+      <nav>
+        <button class="nav-link active" data-page="assistant">◌ <span>AI Assistant</span></button>
+        <button class="nav-link" data-page="scamcheck">⛨ <span>ScamCheck AI</span></button>
+        <button class="nav-link" data-page="knowledge">▣ <span>Knowledge Base</span><b id="documentCount"></b></button>
+        <button class="nav-link" data-page="documents">▤ <span>Documents</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="nav-link" data-page="settings">⚙ <span>Settings</span></button>
+        <div class="profile"><span>Q</span><div><strong>Student</strong><small>● Online</small></div></div>
+      </div>
+    </aside>
+    <div class="overlay" id="overlay"></div>
+    <main>
+      <button id="menuButton" class="menu-button" aria-label="Open navigation">☰</button>
+      <header id="pageHeader" hidden><div><h2 id="pageTitle"></h2><p id="pageDescription"></p></div></header>
+      <section id="assistantPage" class="page assistant-page">
+        <div id="emptyState" class="welcome">
+          <span class="hero-icon">✦</span><h1>Quanta AI</h1>
+          <p>Your intelligent knowledge assistant. Ask questions and discover insights from your uploaded documents.</p>
+          <div id="readyPill" class="ready-pill" hidden></div>
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+        <div id="messages" class="messages" hidden></div>
+      </section>
+      <section id="scamcheckPage" class="page" hidden>
+        <div class="content-wrap scam-content">
+          <div class="page-intro"><span class="panel-icon">⛨</span><div><h1>ScamCheck AI</h1><p>Check internship and job offers before you trust them.</p></div></div>
+          <div class="example-row"><span>Try an example:</span><button data-scam-example="high">High risk</button><button data-scam-example="medium">Medium risk</button><button data-scam-example="low">Low risk</button></div>
+          <article class="scam-panel">
+            <div class="scam-tabs"><button class="scam-tab active" data-scam-tab="text">▤ Paste text</button><button class="scam-tab" data-scam-tab="image">▧ Upload screenshot</button></div>
+            <div id="scamTextPane"><textarea id="scamText" maxlength="10000" placeholder="Paste a WhatsApp message, email, internship offer, LinkedIn post, or job description..."></textarea><div class="text-meta"><span id="scamCharacterCount">0 / 10000 characters</span><span>Supported: WhatsApp · Email · LinkedIn · Telegram · Job portals</span></div></div>
+            <div id="scamImagePane" hidden><input id="scamImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden /><button id="scamUploadButton" class="image-upload">⇧<strong>Upload a screenshot</strong><span>PNG, JPG, or WEBP · Maximum 5 MB</span></button><img id="scamImagePreview" hidden alt="Screenshot preview" /><p id="scamOcrNote"></p></div>
+            <button id="analyzeScamButton" class="analyze-button">⚡ Analyze opportunity <span>→</span></button>
+          </article>
+          <div id="scamResult" hidden></div>
+          <p class="scam-disclaimer">⚠️ ScamCheck provides risk indicators, not proof of fraud. Always verify opportunities through official channels.</p>
+        </div>
+      </section>
+      <section id="knowledgePage" class="page" hidden>
+        <div class="content-wrap"><div class="page-intro"><span class="panel-icon">▣</span><div><h1>Knowledge Base</h1><p>Upload and manage documents for Quanta AI.</p></div></div>
+          <button id="uploadZone" class="upload-zone"><span>⇧</span><strong>Upload documents</strong><small>PDF, TXT, DOCX, CSV, XLSX, or PPTX</small><em>Click to select files</em></button>
+          <input id="fileInput" type="file" accept=".pdf,.txt,.docx,.csv,.xlsx,.pptx" multiple hidden />
+          <div id="knowledgeDocuments"></div>
+        </div>
+      </section>
+      <section id="documentsPage" class="page" hidden><div class="content-wrap"><div class="page-intro"><span class="panel-icon">▤</span><div><h1>Documents</h1><p>All documents currently available to your AI assistant.</p></div></div><div id="documentGrid"></div></div></section>
+      <section id="settingsPage" class="page" hidden><div class="content-wrap narrow"><div class="page-intro"><span class="panel-icon">⚙</span><div><h1>Application Settings</h1><p>Manage your chat and knowledge base.</p></div></div>
+        <article class="setting-card"><div><h3>Gemini API key</h3><p>Needed only for real AI answers. It stays in this browser session and is never saved in the files.</p></div><div class="key-control"><input id="apiKeyInput" type="password" placeholder="Paste Gemini API key" autocomplete="off"/><button id="saveKey">Save</button></div></article>
+        <article class="setting-card"><div><h3>Clear documents</h3><p>Remove all uploaded documents from the knowledge base.</p></div><button class="danger" data-confirm="clearDocuments">Clear documents</button></article>
+        <article class="setting-card"><div><h3>Clear current chat</h3><p>Remove the messages from the open conversation.</p></div><button class="danger" data-confirm="clearChat">Clear chat</button></article>
+        <article class="about-card"><h3>About Quanta AI</h3><p>Quanta AI searches your uploaded documents and answers questions using their content.</p><span>Document RAG</span><span>Vanilla HTML/CSS/JS</span></article>
+      </div></section>
+      <footer id="chatInput"><div class="input-wrap"><input id="questionInput" placeholder="Upload a document first..."/><button id="sendButton" aria-label="Send message">➤</button></div><small id="inputStatus">Upload a document to start building your knowledge base</small></footer>
+    </main>
+  </div>
+  <div id="modal" class="modal" hidden><div><h2 id="modalTitle">Confirm action</h2><p id="modalText"></p><footer><button id="cancelModal">Cancel</button><button id="confirmModal" class="danger">Confirm</button></footer></div></div>
+</body>
+</html>

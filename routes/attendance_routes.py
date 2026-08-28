@@ -39,7 +39,7 @@ def admin_attendance():
     # Get all attendance records
     all_attendance = []
     for class_item in classes:
-        records = AttendanceModel.get_attendance_by_class(class_item['id'])
+        records = AttendanceModel.get_by_class(class_item['id'])
         all_attendance.extend(records)
     
     return render_template('admin/admin_attendance.html',
@@ -215,12 +215,12 @@ def mark_attendance():
 
 
 # ==========================================
-# STUDENT - View Attendance Report
+# STUDENT - View Attendance Report (UPDATED)
 # ==========================================
 
 @attendance_bp.route('/student/report')
 def student_attendance_report():
-    """Student view attendance report"""
+    """Student view attendance report with 5% per present"""
     if 'user_id' not in session:
         flash('⚠️ Please login first.', 'error')
         return redirect(url_for('auth.login'))
@@ -232,13 +232,19 @@ def student_attendance_report():
         flash('⚠️ Complete your profile first.', 'warning')
         return redirect(url_for('student.student_edit_profile'))
     
-    attendance = AttendanceModel.get_by_student(student['id'])
-    percentage = AttendanceModel.get_attendance_percentage(student['id'])
+    # Get attendance data with new calculation
+    attendance_data = AttendanceModel.get_student_attendance_with_percentage(student['id'])
+    
+    # Debug: Print to console
+    print(f"Student: {student.get('name')}")
+    print(f"Working Day: {attendance_data['working_day']}")
+    print(f"Present Count: {attendance_data['present_count']}")
+    print(f"Attendance %: {attendance_data['attendance_percentage']}%")
     
     return render_template('student/student_attendance_report.html',
                          name=session.get('user_name'),
-                         attendance=attendance,
-                         percentage=percentage)
+                         student=student,
+                         attendance_data=attendance_data)
 
 
 # ==========================================

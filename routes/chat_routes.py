@@ -1,5 +1,5 @@
 # ==========================================
-# AI CHATBOT ROUTES (WITH GEMINI AI)
+# AI CHATBOT ROUTES (OLLAMA AI ONLY)
 # ==========================================
 
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
@@ -9,13 +9,13 @@ from models.risk_flag_model import RiskFlagModel
 from models.user_model import UserModel
 from models.mentor_note_model import MentorNoteModel
 from utils.file_utils import save_od_image
-from utils.chat_utils import GeminiChat
+from utils.chat_utils import OllamaChat
 import re
 
 chat_bp = Blueprint('chat', __name__, url_prefix='/chat')
 
-# Initialize Gemini AI
-gemini = GeminiChat()
+# Initialize Ollama AI
+ollama = OllamaChat()
 
 
 # ==========================================
@@ -81,7 +81,7 @@ def admin_chat():
 
 @chat_bp.route('/api', methods=['POST'])
 def chat_api():
-    """AI Chat API with Gemini"""
+    """AI Chat API with Ollama"""
     if 'user_id' not in session:
         return jsonify({'error': 'Please login first'}), 401
     
@@ -108,49 +108,50 @@ def chat_api():
             if risk:
                 student['risk'] = risk
             
-            # Check if asking about profile/risk
             if is_profile_query(message):
                 return jsonify({'reply': generate_student_response(student, risk)})
             
-            # Use Gemini for response
-            response = gemini.get_response(message, student, file)
-            return jsonify({'reply': response})
+            # Use Ollama for response
+            try:
+                response = ollama.get_response(message, student, file)
+                return jsonify({'reply': response})
+            except Exception as e:
+                print(f"❌ Ollama error: {e}")
+                return jsonify({'reply': f"⚠️ Error: {str(e)}"})
         
         # ==========================================
         # MENTOR / ADMIN: Can see ALL students
         # ==========================================
         elif role in ['admin', 'mentor']:
-            # Check for high risk students
             if 'high risk' in message.lower() or 'which student' in message.lower():
                 return jsonify({'reply': get_high_risk_students()})
             
-            # Check for low attendance
             if 'low attendance' in message.lower():
                 return jsonify({'reply': get_low_attendance_students()})
             
-            # Check for specific student
             student_name = extract_student_name(message)
             if student_name:
                 return jsonify({'reply': analyze_specific_student(student_name)})
             
-            # Check for summary
             if 'summary' in message.lower() or 'overview' in message.lower():
                 return jsonify({'reply': get_summary_report()})
             
-            # General question with all student data context
             all_students_data = get_all_students_data_string()
-            response = gemini.get_response(message, all_students_data, file)
-            return jsonify({'reply': response})
+            try:
+                response = ollama.get_response_with_all_students(message, all_students_data, file)
+                return jsonify({'reply': response})
+            except Exception as e:
+                print(f"❌ Ollama error: {e}")
+                return jsonify({'reply': f"⚠️ Error: {str(e)}"})
         
-        # ==========================================
-        # FALLBACK
-        # ==========================================
         else:
-            return jsonify({'reply': "I'm not sure how to help with that."})
+            return jsonify({'reply': "⚠️ I'm not sure how to help with that."})
         
     except Exception as e:
         print(f"❌ Chat error: {e}")
-        return jsonify({'reply': f"⚠️ Error: {str(e)}. Please try again."})
+        import traceback
+        traceback.print_exc()
+        return jsonify({'reply': f"⚠️ Error: {str(e)}"}), 500
 
 
 # ==========================================

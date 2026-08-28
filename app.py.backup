@@ -30,6 +30,7 @@ app.register_blueprint(search_bp)            # Global Search
 app.register_blueprint(attendance_bp)        # QR Attendance
 app.register_blueprint(engagement_bp)        # Engagement Analytics
 app.register_blueprint(attendance_otp_bp)    # OTP Attendance
+app.register_blueprint(ai_tools_bp)
 
 # ==========================================
 # ROOT ROUTE - Redirect to Login

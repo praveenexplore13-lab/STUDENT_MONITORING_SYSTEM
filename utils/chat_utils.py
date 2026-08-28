@@ -1,28 +1,64 @@
 # ==========================================
-# CHAT UTILITIES (GEMINI AI - FIXED)
+# CHAT UTILITIES - OLLAMA AI ONLY
 # ==========================================
 
-import google.generativeai as genai
 from config import Config
-import base64
-import io
-from PIL import Image
+import requests
+import json
+import time
 
-class GeminiChat:
+class OllamaChat:
     def __init__(self):
-        """Initialize Gemini AI with API key"""
+        """Initialize Ollama AI"""
+        self.ollama_url = "http://localhost:11434/api/generate"
+        self.ollama_models = ["llama3.2:1b", "llama2", "mistral", "phi", "gemma"]
+        self.ollama_available_model = None
+        
+        # Check which Ollama models are available
+        self._check_ollama_models()
+
+    def _check_ollama_models(self):
+        """Check which Ollama models are available"""
         try:
-            genai.configure(api_key=Config.GEMINI_API_KEY)
-            self.model = genai.GenerativeModel('models/gemini-3.6-flash')
-            print("✅ Gemini AI initialized successfully!")
+            # Check if Ollama is running
+            response = requests.get("http://localhost:11434/api/tags", timeout=2)
+            if response.status_code == 200:
+                data = response.json()
+                available_models = [model['name'] for model in data.get('models', [])]
+                print(f"📦 Available Ollama models: {available_models}")
+                
+                # Find the first available model from our list
+                for model in self.ollama_models:
+                    if model in available_models or any(model in m for m in available_models):
+                        self.ollama_available_model = model
+                        print(f"✅ Using Ollama model: {model}")
+                        break
+                
+                if not self.ollama_available_model:
+                    print("⚠️ No Ollama models found. Please run: ollama pull llama2")
+            else:
+                print("⚠️ Ollama is not responding")
         except Exception as e:
-            print(f"❌ Gemini AI initialization failed: {e}")
-            self.model = None
+            print(f"⚠️ Ollama not available: {e}")
 
     def get_response_with_all_students(self, message, all_students_data, image_file=None):
-        """Get response with all students data"""
-        if not self.model:
-            return "⚠️ Gemini AI is not configured."
+        """Get response with all students data - Ollama only"""
+        return self._get_ollama_response(message, all_students_data, image_file)
+
+    def get_response(self, message, student_data, image_file=None):
+        """Get response for single student - Ollama only"""
+        return self._get_ollama_student_response(message, student_data, image_file)
+
+    # ==========================================
+    # OLLAMA API CALLS
+    # ==========================================
+    
+    def _get_ollama_response(self, message, all_students_data, image_file=None):
+        """Get response from Ollama"""
+        
+        # Check if we have an available model
+        if not self.ollama_available_model:
+            return "⚠️ No Ollama model available. Please run: ollama pull llama2"
         
         try:
             prompt = f"""
@@ -33,79 +69,74 @@ You have access to ALL student data.
 
 USER QUESTION: {message}
 
-IMPORTANT INSTRUCTIONS:
-1. Use the student data above to answer accurately.
-2. If asked about LOW RISK students, list ONLY LOW risk students with their details.
-3. If asked about HIGH RISK students, list ONLY HIGH risk students with their details.
-4. If asked about MEDIUM RISK students, list ONLY MEDIUM risk students.
-5. Provide clear, structured responses with student names, roll numbers, CGPA, and attendance.
-6. Be accurate - only mention students from the data provided.
-
-Answer:
+Answer clearly and helpfully. Use the data provided.
 """
-            if image_file and image_file.filename != "":
-                image_bytes = image_file.read()
-                image = Image.open(io.BytesIO(image_bytes))
-                response = self.model.generate_content([prompt, image])
-                return response.text
+            
+            response = requests.post(
+                self.ollama_url,
+                json={
+                    "model": self.ollama_available_model,
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result.get('response', 'No response from Ollama.')
+            elif response.status_code == 404:
+                return f"⚠️ Ollama model '{self.ollama_available_model}' not found. Please run: ollama pull {self.ollama_available_model}"
             else:
-                response = self.model.generate_content(prompt)
-                return response.text
+                return f"⚠️ Ollama Error: {response.status_code}"
+                
+        except requests.exceptions.ConnectionError:
+            return "⚠️ Ollama is not running. Please start it with 'ollama serve'"
         except Exception as e:
-            print(f"❌ Gemini error: {e}")
-            return f"⚠️ Error: {str(e)}"
+            return f"⚠️ Ollama Error: {str(e)}"
 
-    def get_response(self, message, student_data, image_file=None):
-        """Get response for single student"""
-        if not self.model:
-            return "⚠️ Gemini AI is not configured."
+    def _get_ollama_student_response(self, message, student_data, image_file=None):
+        """Get student-specific response from Ollama"""
+        
+        # Check if we have an available model
+        if not self.ollama_available_model:
+            return "⚠️ No Ollama model available. Please run: ollama pull llama2"
         
         try:
-            prompt = self.build_prompt(message, student_data)
-            if image_file and image_file.filename != "":
-                image_bytes = image_file.read()
-                image = Image.open(io.BytesIO(image_bytes))
-                response = self.model.generate_content([prompt, image])
-                return response.text
-            else:
-                response = self.model.generate_content(prompt)
-                return response.text
-        except Exception as e:
-            print(f"❌ Gemini error: {e}")
-            return f"⚠️ Error: {str(e)}"
-
-    def build_prompt(self, message, student_data):
-        """Build prompt for student data"""
-        base_prompt = """
+            prompt = f"""
 You are an AI Assistant for a Student Monitoring System.
 Be friendly, professional, and helpful.
-"""
-        
-        if student_data:
-            if isinstance(student_data, dict):
-                student_prompt = f"""
 
 STUDENT DATA:
-- Name: {student_data.get('name', 'Not set')}
-- Roll Number: {student_data.get('roll_number', 'Not set')}
-- Department: {student_data.get('department', 'Not set')}
-- CGPA: {student_data.get('cgpa', 'Not set')}
-- Attendance: {student_data.get('attendance_percentage', 'Not set')}%
-- Internal Marks: {student_data.get('internal_marks', 'Not set')}
-- Assignments: {student_data.get('assignments_submitted', '0')}/{student_data.get('total_assignments', '0')}
-"""
-                if student_data.get('risk'):
-                    risk = student_data['risk']
-                    student_prompt += f"""
-- Risk Level: {risk.get('risk_level', 'Not set').upper()}
-- Risk Factors: {risk.get('risk_factors', 'No risk factors')}
-"""
-                base_prompt += student_prompt
-        
-        base_prompt += f"""
+- Name: {student_data.get('name', 'Not set') if student_data else 'Not available'}
+- Roll Number: {student_data.get('roll_number', 'Not set') if student_data else 'Not available'}
+- CGPA: {student_data.get('cgpa', 'Not set') if student_data else 'Not available'}
+- Attendance: {student_data.get('attendance_percentage', 'Not set')}% if student_data else 'Not available'
 
 USER QUESTION: {message}
 
 Answer naturally and helpfully.
 """
-        return base_prompt
+            
+            response = requests.post(
+                self.ollama_url,
+                json={
+                    "model": self.ollama_available_model,
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                return result.get('response', 'No response from Ollama.')
+            elif response.status_code == 404:
+                return f"⚠️ Ollama model '{self.ollama_available_model}' not found. Please run: ollama pull {self.ollama_available_model}"
+            else:
+                return f"⚠️ Ollama Error: {response.status_code}"
+                
+        except requests.exceptions.ConnectionError:
+            return "⚠️ Ollama is not running. Please start it with 'ollama serve'"
+        except Exception as e:
+            return f"⚠️ Ollama Error: {str(e)}"

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/student.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+    
 </head>
+
 <body>
     <div class="student-container">
         <nav class="sidebar">
@@ -16,58 +19,77 @@
                 <span>Student Panel</span>
             </div>
             <ul class="sidebar-menu">
-                <li class="active"><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li class="active"><a href="{{ url_for('student.student_dashboard') }}"><i class="fas fa-home"></i>
+                        Dashboard</a></li>
                 <li><a href="{{ url_for('student.student_profile') }}"><i class="fas fa-user"></i> Profile</a></li>
-                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
-                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a></li>
-                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD Request</a></li>
-                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a></li>
-                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark Attendance</a></li>
-                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My Attendance</a></li>
-                <li><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My Engagement</a></li>
+                <li><a href="{{ url_for('student.student_edit_profile') }}"><i class="fas fa-edit"></i> Edit Profile</a>
+                </li>
+                <li><a href="{{ url_for('student.student_notes') }}"><i class="fas fa-sticky-note"></i> Mentor Notes</a>
+                </li>
+                <li><a href="{{ url_for('student.student_notifications') }}"><i class="fas fa-bell"></i>
+                        Notifications</a></li>
+                <li><a href="{{ url_for('student.student_od_request') }}"><i class="fas fa-calendar-plus"></i> OD
+                        Request</a></li>
+                <li><a href="{{ url_for('student.student_od_status') }}"><i class="fas fa-history"></i> OD Status</a>
+                </li>
+                <li><a href="{{ url_for('attendance_otp.student_attendance') }}"><i class="fas fa-qrcode"></i> Mark
+                        Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_attendance_report') }}"><i class="fas fa-clock"></i> My
+                        Attendance</a></li>
+                <li><a href="{{ url_for('attendance.student_engagement') }}"><i class="fas fa-chart-line"></i> My
+                        Engagement</a></li>
                 <li><a href="{{ url_for('chat.student_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li>
+                    <a href="{{ url_for('ai_tools.ai_tools') }}">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Tools</span>
+                    </a>
+                </li>
+                
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
 
         <main class="main-content">
             <header class="top-header">
-                <div class="header-left"><h1>Student Dashboard</h1></div>
+                <div class="header-left">
+                    <h1>Student Dashboard</h1>
+                </div>
                 <div class="header-right"><span><i class="fas fa-user"></i> {{ name }}</span></div>
             </header>
 
             {% if student %}
             <div class="voice-welcome" id="voiceWelcome">
                 <i class="fas fa-volume-up"></i>
-                <span id="voiceMessage">Welcome back, {{ name }}! We're so happy to see you again. Have a wonderful day!</span>
+                <span id="voiceMessage">Welcome back, {{ name }}! We're so happy to see you again. Have a wonderful
+                    day!</span>
             </div>
             {% endif %}
 
             <div class="profile-summary">
                 <div class="profile-avatar">
                     {% if student and student.profile_image %}
-                        <img src="{{ url_for('static', filename=student.profile_image) }}" alt="Profile">
+                    <img src="{{ url_for('static', filename=student.profile_image) }}" alt="Profile">
                     {% else %}
-                        <i class="fas fa-user-circle"></i>
+                    <i class="fas fa-user-circle"></i>
                     {% endif %}
                 </div>
                 <div class="profile-info">
                     <h2>{{ name }}</h2>
                     <p><i class="fas fa-envelope"></i> {{ session.user_email }}</p>
                     {% if student %}
-                        <p><i class="fas fa-id-card"></i> Roll: {{ student.roll_number or 'Not set' }}</p>
-                        <p><i class="fas fa-building"></i> {{ student.department or 'Not set' }}</p>
-                        {% if student.risk and student.risk.risk_level == 'high' %}
-                            <span class="badge red">🔴 High Risk</span>
-                        {% elif student.risk and student.risk.risk_level == 'medium' %}
-                            <span class="badge yellow">🟡 Medium Risk</span>
-                        {% else %}
-                            <span class="badge green">🟢 Low Risk</span>
-                        {% endif %}
+                    <p><i class="fas fa-id-card"></i> Roll: {{ student.roll_number or 'Not set' }}</p>
+                    <p><i class="fas fa-building"></i> {{ student.department or 'Not set' }}</p>
+                    {% if student.risk and student.risk.risk_level == 'high' %}
+                    <span class="badge red">🔴 High Risk</span>
+                    {% elif student.risk and student.risk.risk_level == 'medium' %}
+                    <span class="badge yellow">🟡 Medium Risk</span>
                     {% else %}
-                        <p><i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Complete your profile!</p>
-                        <a href="{{ url_for('student.student_edit_profile') }}" class="btn-sm">Complete Profile</a>
+                    <span class="badge green">🟢 Low Risk</span>
+                    {% endif %}
+                    {% else %}
+                    <p><i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Complete your profile!</p>
+                    <a href="{{ url_for('student.student_edit_profile') }}" class="btn-sm">Complete Profile</a>
                     {% endif %}
                 </div>
             </div>
@@ -76,19 +98,31 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon blue"><i class="fas fa-star"></i></div>
-                    <div class="stat-info"><h3>{{ student.cgpa or '-' }}</h3><p>CGPA</p></div>
+                    <div class="stat-info">
+                        <h3>{{ student.cgpa or '-' }}</h3>
+                        <p>CGPA</p>
+                    </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon green"><i class="fas fa-chart-line"></i></div>
-                    <div class="stat-info"><h3>{{ student.attendance_percentage or '-' }}%</h3><p>Attendance</p></div>
+                    <div class="stat-info">
+                        <h3>{{ student.attendance_percentage or '-' }}%</h3>
+                        <p>Attendance</p>
+                    </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon purple"><i class="fas fa-file-alt"></i></div>
-                    <div class="stat-info"><h3>{{ student.assignments_submitted or '0' }}/{{ student.total_assignments or '0' }}</h3><p>Assignments</p></div>
+                    <div class="stat-info">
+                        <h3>{{ student.assignments_submitted or '0' }}/{{ student.total_assignments or '0' }}</h3>
+                        <p>Assignments</p>
+                    </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
-                    <div class="stat-info"><h3>{{ student.semester or '-' }}</h3><p>Semester</p></div>
+                    <div class="stat-info">
+                        <h3>{{ student.semester or '-' }}</h3>
+                        <p>Semester</p>
+                    </div>
                 </div>
             </div>
 
@@ -104,11 +138,14 @@
                 </a>
             </div>
             {% else %}
-            <div class="welcome-box" style="text-align:center;padding:40px 20px;background:rgba(255,255,255,0.08);border-radius:12px;">
+            <div class="welcome-box"
+                style="text-align:center;padding:40px 20px;background:rgba(255,255,255,0.08);border-radius:12px;">
                 <i class="fas fa-user-plus" style="font-size:48px;color:#a5b4fc;"></i>
                 <h2 style="color:white;margin:15px 0;">Welcome to Your Dashboard!</h2>
                 <p style="color:#cbd5e1;">Please complete your profile to get started.</p>
-                <a href="{{ url_for('student.student_edit_profile') }}" class="btn-primary" style="display:inline-block;margin-top:15px;padding:12px 30px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border-radius:10px;text-decoration:none;">Create Profile</a>
+                <a href="{{ url_for('student.student_edit_profile') }}" class="btn-primary"
+                    style="display:inline-block;margin-top:15px;padding:12px 30px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border-radius:10px;text-decoration:none;">Create
+                    Profile</a>
             </div>
             {% endif %}
         </main>
@@ -139,22 +176,22 @@
             if (statusDiv) {
                 statusDiv.innerHTML = `<i class="fas fa-volume-up" style="color: #10b981; animation: pulse 1s ease-in-out infinite;"></i><span style="color: #10b981;">🔊 Speaking welcome message...</span>`;
             }
-            message.onend = function() {
+            message.onend = function () {
                 if (statusDiv) {
                     statusDiv.innerHTML = `<i class="fas fa-check-circle" style="color: #a5b4fc;"></i><span style="color: #a5b4fc;">✅ Welcome complete!</span>`;
                 }
             };
-            message.onerror = function() {
+            message.onerror = function () {
                 if (statusDiv) {
                     statusDiv.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #f87171;"></i><span style="color: #f87171;">❌ Error speaking</span>`;
                 }
             };
             try { speechSynthesis.speak(message); } catch (error) { console.error('Speech error:', error); }
         }
-        setTimeout(function() { speakWelcome(); }, 800);
+        setTimeout(function () { speakWelcome(); }, 800);
         {% endif %}
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
                 setTimeout(() => {
@@ -167,4 +204,5 @@
         console.log('%c 🎤 Voice Welcome System Loaded! ', 'background: #6366f1; color: white; font-size: 14px; font-weight: bold; padding: 8px; border-radius: 5px;');
     </script>
 </body>
+
 </html>

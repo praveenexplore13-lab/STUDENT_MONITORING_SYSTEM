@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mentor.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
+    <style>
+        .date-selector {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 15px 0;
+        }
+        .date-selector input[type="date"] {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        .date-selector input[type="date"]:focus {
+            border-color: #f59e0b;
+            outline: none;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .summary-card {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .summary-card.total { background: #dbeafe; border-left: 4px solid #3b82f6; }
+        .summary-card.present { background: #d1fae5; border-left: 4px solid #10b981; }
+        .summary-card.absent { background: #fee2e2; border-left: 4px solid #ef4444; }
+        .summary-card.notmarked { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .summary-card .number { font-size: 32px; font-weight: bold; }
+        .summary-card .label { color: #64748b; font-size: 14px; margin-top: 4px; }
+        .summary-card.total .number { color: #3b82f6; }
+        .summary-card.present .number { color: #10b981; }
+        .summary-card.absent .number { color: #ef4444; }
+        .summary-card.notmarked .number { color: #f59e0b; }
+        .attendance-list { margin-top: 15px; }
+        .attendance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            background: #f8fafc;
+        }
+        .attendance-item.present { background: #d1fae5; border-left: 4px solid #10b981; }
+        .attendance-item.absent { background: #fee2e2; border-left: 4px solid #ef4444; }
+        .attendance-item.not-marked { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .student-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .student-name { font-weight: 600; color: #1a1a2e; }
+        .student-roll { color: #64748b; font-size: 13px; }
+        .student-dept { color: #94a3b8; font-size: 12px; background: #e2e8f0; padding: 2px 10px; border-radius: 12px; }
+        .status-badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .status-badge.present { background: #10b981; color: white; }
+        .status-badge.absent { background: #ef4444; color: white; }
+        .status-badge.not-marked { background: #f59e0b; color: white; }
+        .no-records { text-align: center; padding: 40px; color: #94a3b8; }
+        .no-records i { font-size: 48px; color: #cbd5e1; display: block; margin-bottom: 15px; }
+
+        /* ===== NEW: Export Button Styles ===== */
+        .export-btn {
+            padding: 8px 20px;
+            background: #0f3460;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            margin-left: auto;
+        }
+        .export-btn:hover {
+            background: #1a5276;
+            transform: scale(1.02);
+        }
+        body.dark-mode .export-btn {
+            background: #6366f1;
+        }
+        body.dark-mode .export-btn:hover {
+            background: #818cf8;
+        }
+        /* ===== END NEW ===== */
+    </style>
+</head>
+<body>
+    <div class="mentor-container">
+        <nav class="sidebar">
+            <div class="sidebar-brand"><i class="fas fa-chalkboard-teacher"></i><span>Mentor Panel</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ url_for('mentor.mentor_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('mentor.mentor_students') }}"><i class="fas fa-users"></i> Students</a></li>
+                <li><a href="{{ url_for('mentor.mentor_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="{{ url_for('mentor.mentor_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
+                <li><a href="{{ url_for('attendance_otp.mentor_attendance') }}"><i class="fas fa-qrcode"></i> Attendance</a></li>
+                <li class="active"><a href="{{ url_for('attendance_otp.mentor_attendance_history') }}"><i class="fas fa-history"></i> History</a></li>
+                
+                <li><a href="{{ url_for('mentor.mentor_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
+                <li><a href="{{ url_for('chat.mentor_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content" style="padding:20px;">
+            <div class="top-header">
+                <h1>📅 Attendance History</h1>
+                <span style="color:#64748b;font-size:14px;">
+                    <i class="fas fa-calendar"></i> {{ selected_date.strftime('%A, %d-%m-%Y') }}
+                </span>
+            </div>
+
+            <!-- Date Selector -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="date-selector">
+                        <form method="GET" action="" style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;width:100%;">
+                            <label style="font-weight:600;color:#1a1a2e;">
+                                <i class="fas fa-calendar-alt"></i> Select Date:
+                            </label>
+                            <input type="date" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}" 
+                                   onchange="this.form.submit()">
+                            <button type="submit" class="btn-primary" style="padding:10px 25px;background:#f59e0b;color:white;border:none;border-radius:8px;cursor:pointer;">
+                                <i class="fas fa-search"></i> View
+                            </button>
+                            <a href="{{ url_for('attendance_otp.mentor_attendance_history') }}?date={{ today.strftime('%Y-%m-%d') }}" 
+                               class="btn-secondary" style="padding:10px 20px;background:#e2e8f0;color:#1a1a2e;border-radius:8px;text-decoration:none;">
+                                <i class="fas fa-calendar-day"></i> Today
+                            </a>
+                            
+                            <!-- ===== NEW: Export Button ===== -->
+                            <button type="button" onclick="exportAttendance()" class="export-btn">
+                                <i class="fas fa-file-export"></i> Export CSV
+                            </button>
+                            <!-- ===== END NEW ===== -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card total">
+                    <div class="number">{{ total_students }}</div>
+                    <div class="label">👥 Total Students</div>
+                </div>
+                <div class="summary-card present">
+                    <div class="number">{{ present_count }}</div>
+                    <div class="label">✅ Present</div>
+                </div>
+                <div class="summary-card absent">
+                    <div class="number">{{ absent_count }}</div>
+                    <div class="label">❌ Absent</div>
+                </div>
+                <div class="summary-card notmarked">
+                    <div class="number">{{ not_marked_count }}</div>
+                    <div class="label">⏳ Not Marked</div>
+                </div>
+            </div>
+
+            <!-- Attendance List -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📋 Attendance for {{ selected_date.strftime('%A, %d-%m-%Y') }}</h3>
+                </div>
+                <div class="card-body">
+                    {% if records %}
+                        <div class="attendance-list">
+                            {% for record in records %}
+                            <div class="attendance-item 
+                                {% if record.status == 'present' %}present
+                                {% elif record.status == 'absent' %}absent
+                                {% else %}not-marked{% endif %}">
+                                <div class="student-info">
+                                    <span class="student-name">{{ record.student_name }}</span>
+                                    <span class="student-roll">({{ record.roll_number or 'N/A' }})</span>
+                                    <span class="student-dept">{{ record.department or 'N/A' }}</span>
+                                    {% if record.record_time %}
+                                    <span style="font-size:12px;color:#64748b;">
+                                        <i class="fas fa-clock"></i> {{ record.record_time }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <span class="status-badge 
+                                        {% if record.status == 'present' %}present
+                                        {% elif record.status == 'absent' %}absent
+                                        {% else %}not-marked{% endif %}">
+                                        {% if record.status == 'present' %}
+                                            ✅ Present
+                                        {% elif record.status == 'absent' %}
+                                            ❌ Absent
+                                        {% else %}
+                                            ⏳ Not Marked
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-records">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>No attendance records found for this date.</p>
+                            <p style="font-size:14px;color:#94a3b8;">Start attendance to begin tracking</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== NEW: Export JavaScript Function ===== -->
+    <script>
+        function exportAttendance() {
+            const date = '{{ selected_date.strftime("%d-%m-%Y") }}';
+            let csv = "\uFEFF"; // UTF-8 BOM for Excel compatibility
+            csv += "Student Name,Roll Number,Department,Status,Time\n";
+            
+            {% for record in records %}
+                let status = '{% if record.status == "present" %}Present{% elif record.status == "absent" %}Absent{% else %}Not Marked{% endif %}';
+                csv += `"{{ record.student_name }}","{{ record.roll_number or 'N/A' }}","{{ record.department or 'N/A' }}","${status}","{{ record.record_time or 'N/A' }}"\n`;
+            {% endfor %}
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `attendance_${date}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+    <!-- ===== END NEW ===== -->
+</body>
+</html>

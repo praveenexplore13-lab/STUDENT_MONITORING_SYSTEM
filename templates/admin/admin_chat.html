@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,69 +10,350 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-mode.css') }}">
     <style>
         /* Same as mentor_chat.html with admin colors */
-        .chat-container { display: flex; height: calc(100vh - 80px); gap: 20px; padding: 20px; }
-        .profile-sidebar { width: 320px; background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-y: auto; flex-shrink: 0; }
-        .chat-main { flex: 1; background: white; border-radius: 16px; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
-        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; min-height: 400px; }
-        .chat-input-area { display: flex; gap: 10px; padding: 15px 20px; border-top: 1px solid #e2e8f0; align-items: center; }
-        .chat-input-area input { flex: 1; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
-        .chat-input-area input:focus { border-color: #6366f1; }
-        .chat-input-area button { padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .message { margin-bottom: 15px; }
-        .message.user { text-align: right; }
-        .message-content { display: inline-block; padding: 10px 16px; border-radius: 12px; max-width: 80%; white-space: pre-wrap; word-wrap: break-word; line-height: 1.6; }
-        .message.user .message-content { background: #6366f1; color: white; }
-        .message.ai .message-content { background: #f1f5f9; color: #1a1a2e; }
-        .stat-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
-        .stat-label { color: #64748b; font-size: 13px; }
-        .stat-value { font-weight: 600; font-size: 13px; color: #1a1a2e; }
-        .student-list-item { padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: 0.3s; margin-bottom: 5px; }
-        .student-list-item:hover { background: #f1f5f9; }
-        .student-list-item .name { font-weight: 600; }
-        .student-list-item .roll { color: #64748b; font-size: 12px; }
-        .student-list-item .risk-high { color: #ef4444; }
-        .student-list-item .risk-low { color: #10b981; }
-        .student-list-item .risk-medium { color: #f59e0b; }
-        .profile-avatar { width: 60px; height: 60px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #6366f1; margin: 0 auto 10px; overflow: hidden; }
-        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-name { text-align: center; }
-        .profile-name h2 { font-size: 18px; color: #1a1a2e; margin-bottom: 2px; }
-        .profile-name p { font-size: 13px; color: #64748b; }
-        .role-badge { display: inline-block; padding: 2px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #2563eb; }
-        .upload-btn { padding: 8px 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; }
-        .upload-btn:hover { background: #cbd5e1; }
-        .file-preview { display: none; padding: 8px 15px; background: #f1f5f9; border-radius: 8px; margin: 5px 20px; align-items: center; gap: 10px; }
-        .file-preview.show { display: flex; }
-        .remove-file { background: none; border: none; color: #ef4444; cursor: pointer; }
-        .student-list-title { font-size: 14px; font-weight: 600; color: #1a1a2e; margin: 10px 0 5px; }
-        .student-list-item .dept { color: #94a3b8; font-size: 11px; }
-        body.dark-mode .profile-sidebar { background: #1a1a2e; }
-        body.dark-mode .chat-main { background: #1a1a2e; }
-        body.dark-mode .stat-value { color: #e2e8f0; }
-        body.dark-mode .chat-input-area { border-top-color: rgba(255,255,255,0.05); }
-        body.dark-mode .chat-input-area input { background: #0f0f1a; color: #e2e8f0; border-color: rgba(255,255,255,0.1); }
-        body.dark-mode .message.ai .message-content { background: #0f0f1a; color: #e2e8f0; }
-        body.dark-mode .stat-item { border-bottom-color: rgba(255,255,255,0.05); }
-        body.dark-mode .profile-name h2 { color: #e2e8f0; }
-        body.dark-mode .student-list-title { color: #e2e8f0; }
-        body.dark-mode .student-list-item:hover { background: rgba(255,255,255,0.05); }
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 80px);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .profile-sidebar {
+            width: 320px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .chat-main {
+            flex: 1;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            min-height: 400px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            align-items: center;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #6366f1;
+        }
+
+        .chat-input-area button {
+            padding: 10px 20px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .message {
+            margin-bottom: 15px;
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-content {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background: #6366f1;
+            color: white;
+        }
+
+        .message.ai .message-content {
+            background: #f1f5f9;
+            color: #1a1a2e;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a1a2e;
+        }
+
+        .student-list-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .student-list-item:hover {
+            background: #f1f5f9;
+        }
+
+        .student-list-item .name {
+            font-weight: 600;
+        }
+
+        .student-list-item .roll {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .student-list-item .risk-high {
+            color: #ef4444;
+        }
+
+        .student-list-item .risk-low {
+            color: #10b981;
+        }
+
+        .student-list-item .risk-medium {
+            color: #f59e0b;
+        }
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #6366f1;
+            margin: 0 auto 10px;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            text-align: center;
+        }
+
+        .profile-name h2 {
+            font-size: 18px;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+        }
+
+        .profile-name p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .upload-btn {
+            padding: 8px 12px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .upload-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .file-preview {
+            display: none;
+            padding: 8px 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin: 5px 20px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-preview.show {
+            display: flex;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+        }
+
+        .student-list-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 10px 0 5px;
+        }
+
+        .student-list-item .dept {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        body.dark-mode .profile-sidebar {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .chat-main {
+            background: #1a1a2e;
+        }
+
+        body.dark-mode .stat-value {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .chat-input-area {
+            border-top-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .chat-input-area input {
+            background: #0f0f1a;
+            color: #e2e8f0;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .message.ai .message-content {
+            background: #0f0f1a;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .stat-item {
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .profile-name h2 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .student-list-title {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .student-list-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
     </style>
 </head>
+
 <body>
     <div class="admin-container">
         <nav class="sidebar">
-            <div class="sidebar-brand"><i class="fas fa-graduation-cap"></i><span>Admin Panel</span></div>
+            <div class="sidebar-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Admin Panel</span>
+            </div>
+
             <ul class="sidebar-menu">
-                <li><a href="{{ url_for('admin.admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="{{ url_for('admin.admin_students') }}"><i class="fas fa-users"></i> Students</a></li>
-                <li><a href="{{ url_for('admin.admin_reports') }}"><i class="fas fa-chart-bar"></i> Reports</a></li>
-                <li><a href="{{ url_for('admin.admin_notifications') }}"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a href="{{ url_for('admin.admin_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
-                <li><a href="{{ url_for('admin.admin_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
-                <li class="active"><a href="{{ url_for('chat.admin_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
-                <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            <li><a href="{{ url_for('attendance_otp.admin_reports') }}"><i class="fas fa-file-alt"></i> Attendance Reports</a></li>
-    </ul>
+
+                <li>
+                    <a href="{{ url_for('admin.admin_dashboard') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('admin.admin_students') }}">
+                        <i class="fas fa-users"></i> Students
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('admin.admin_reports') }}">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('admin.admin_notifications') }}">
+                        <i class="fas fa-bell"></i> Notifications
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('admin.admin_od_requests') }}">
+                        <i class="fas fa-calendar-check"></i> OD Requests
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('admin.admin_profile') }}">
+                        <i class="fas fa-user-cog"></i> Profile
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('chat.admin_chat') }}">
+                        <i class="fas fa-robot"></i> AI Chatbot
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('attendance_otp.admin_reports') }}">
+                        <i class="fas fa-file-alt"></i> Attendance Reports
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ url_for('auth.logout') }}">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+
+            </ul>
         </nav>
 
         <main class="main-content" style="padding:20px;">
@@ -87,22 +369,22 @@
                     <div class="student-list-title">📋 All Students</div>
                     <div id="studentList">
                         {% if all_students %}
-                            {% for s in all_students %}
-                                <div class="student-list-item" onclick="askAboutStudent('{{ s.name }}')">
-                                    <span class="name">{{ s.name }}</span>
-                                    <span class="roll">({{ s.roll_number or 'N/A' }})</span>
-                                    <span class="dept">{{ s.department or 'N/A' }}</span>
-                                    {% if s.risk_level == 'high' %}
-                                        <span class="risk-high">🔴 High</span>
-                                    {% elif s.risk_level == 'medium' %}
-                                        <span class="risk-medium">🟡 Medium</span>
-                                    {% else %}
-                                        <span class="risk-low">🟢 Low</span>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                        {% for s in all_students %}
+                        <div class="student-list-item" onclick="askAboutStudent('{{ s.name }}')">
+                            <span class="name">{{ s.name }}</span>
+                            <span class="roll">({{ s.roll_number or 'N/A' }})</span>
+                            <span class="dept">{{ s.department or 'N/A' }}</span>
+                            {% if s.risk_level == 'high' %}
+                            <span class="risk-high">🔴 High</span>
+                            {% elif s.risk_level == 'medium' %}
+                            <span class="risk-medium">🟡 Medium</span>
+                            {% else %}
+                            <span class="risk-low">🟢 Low</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                         {% else %}
-                            <p style="color:#94a3b8;font-size:13px;">No students found.</p>
+                        <p style="color:#94a3b8;font-size:13px;">No students found.</p>
                         {% endif %}
                     </div>
                 </div>
@@ -110,7 +392,9 @@
                 <div class="chat-main">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message ai">
-                            <div class="message-content">👋 Hello {{ name }}! I'm your AI Assistant. I can help you analyze student data, generate reports, and get insights about any student. Ask me anything!</div>
+                            <div class="message-content">👋 Hello {{ name }}! I'm your AI Assistant. I can help you
+                                analyze student data, generate reports, and get insights about any student. Ask me
+                                anything!</div>
                         </div>
                     </div>
                     <div class="file-preview" id="filePreview">
@@ -120,9 +404,11 @@
                     <div class="chat-input-area">
                         <div class="upload-btn-wrapper" style="position:relative;">
                             <button class="upload-btn"><i class="fas fa-paperclip"></i></button>
-                            <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.txt" style="position:absolute;left:0;top:0;opacity:0;width:100%;height:100%;cursor:pointer;">
+                            <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.txt"
+                                style="position:absolute;left:0;top:0;opacity:0;width:100%;height:100%;cursor:pointer;">
                         </div>
-                        <input type="text" id="chatInput" placeholder="Ask about a student, get summary, or type a question..." maxlength="500">
+                        <input type="text" id="chatInput"
+                            placeholder="Ask about a student, get summary, or type a question..." maxlength="500">
                         <button id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
                     </div>
                 </div>
@@ -132,7 +418,7 @@
 
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const chatInput = document.getElementById('chatInput');
             const sendBtn = document.getElementById('sendBtn');
             const messagesContainer = document.getElementById('chatMessages');
@@ -165,22 +451,22 @@
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
-                .then(data => {
-                    removeTypingIndicator(typingId);
-                    addMessage(data.reply || 'Sorry, I could not process your request.', 'ai');
-                    chatInput.disabled = false;
-                    sendBtn.disabled = false;
-                    chatInput.focus();
-                    scrollToBottom();
-                    removeFile();
-                })
-                .catch(error => {
-                    removeTypingIndicator(typingId);
-                    addMessage('❌ Sorry, I encountered an error. Please try again.', 'ai');
-                    chatInput.disabled = false;
-                    sendBtn.disabled = false;
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        removeTypingIndicator(typingId);
+                        addMessage(data.reply || 'Sorry, I could not process your request.', 'ai');
+                        chatInput.disabled = false;
+                        sendBtn.disabled = false;
+                        chatInput.focus();
+                        scrollToBottom();
+                        removeFile();
+                    })
+                    .catch(error => {
+                        removeTypingIndicator(typingId);
+                        addMessage('❌ Sorry, I encountered an error. Please try again.', 'ai');
+                        chatInput.disabled = false;
+                        sendBtn.disabled = false;
+                    });
             }
 
             function addMessage(text, sender) {
@@ -219,12 +505,12 @@
                 filePreview.classList.remove('show');
             }
 
-            window.askAboutStudent = function(name) {
+            window.askAboutStudent = function (name) {
                 chatInput.value = `Tell me about ${name}`;
                 sendMessage();
             };
 
-            fileInput.addEventListener('change', function() {
+            fileInput.addEventListener('change', function () {
                 if (this.files && this.files.length > 0) {
                     selectedFile = this.files[0];
                     fileName.textContent = selectedFile.name;
@@ -233,7 +519,7 @@
             });
 
             sendBtn.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', function(e) {
+            chatInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
@@ -245,4 +531,5 @@
         });
     </script>
 </body>
+
 </html>

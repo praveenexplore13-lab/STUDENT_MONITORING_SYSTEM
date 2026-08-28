@@ -26,10 +26,10 @@ class Config:
     GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
     
     # ==========================================
-    # GEMINI AI CONFIGURATION
+    # OLLAMA CONFIGURATION
     # ==========================================
-    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
-    GEMINI_MODEL = 'models/gemini-1.5-flash'  # or 'models/gemini-1.5-pro'
+    OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434/api/generate')
+    OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.2:1b')
     
     # Upload settings
     UPLOAD_FOLDER = "static/uploads/profiles"

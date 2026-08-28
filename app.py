@@ -1,6 +1,7 @@
 ﻿from flask import Flask, redirect, url_for, session
 from config import Config
 from database import init_db
+from routes.ai_tools_routes import ai_tools_bp
 
 # Import all blueprints
 from routes.auth_routes import auth_bp
@@ -30,6 +31,7 @@ app.register_blueprint(search_bp)
 app.register_blueprint(attendance_bp)
 app.register_blueprint(engagement_bp)
 app.register_blueprint(attendance_otp_bp)
+app.register_blueprint(ai_tools_bp)
 
 @app.route("/")
 def index():
