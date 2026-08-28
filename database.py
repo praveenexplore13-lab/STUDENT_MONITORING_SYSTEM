@@ -13,6 +13,7 @@ def get_db_connection():
             user=Config.DB_USER,
             password=Config.DB_PASSWORD,
             database=Config.DB_NAME
+            port=Config.DB_PORT,
         )
         return conn
     except mysql.connector.Error as e:
