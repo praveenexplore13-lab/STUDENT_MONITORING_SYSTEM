@@ -26,6 +26,7 @@ class Config:
     DB_USER = os.getenv('DB_USER', 'root')
     DB_PASSWORD = os.getenv('DB_PASSWORD', 'Praveen2007')
     DB_NAME = os.getenv('DB_NAME', 'login_otp_db')
+    DB_PORT = os.getenv('DB_PORT', '3306')
 
     # ==========================================
     # GMAIL SETTINGS (FOR NOTIFICATIONS)
