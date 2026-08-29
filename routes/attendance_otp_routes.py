@@ -1,5 +1,5 @@
 # ==========================================
-# ATTENDANCE OTP ROUTES (WITH DATE/TIME)
+# ATTENDANCE OTP ROUTES (WITH DATE/TIME & NO DUPLICATES)
 # ==========================================
 
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify
@@ -221,6 +221,7 @@ def close_attendance(session_id):
             JOIN student_profiles sp ON ar.student_id = sp.id
             JOIN users u ON sp.user_id = u.id
             WHERE ar.session_id = %s
+            GROUP BY ar.student_id, u.name, sp.roll_number, sp.department, ar.status, ar.record_date, ar.record_time
             ORDER BY ar.status DESC, u.name ASC
         """, (session_id,))
         
@@ -535,9 +536,13 @@ def student_attendance():
                          today=datetime.now().strftime('%A, %d-%m-%Y'))
 
 
+# ==========================================
+# ✅ FIXED: MENTOR ATTENDANCE HISTORY (NO DUPLICATES)
+# ==========================================
+
 @attendance_otp_bp.route('/mentor/history')
 def mentor_attendance_history():
-    """Mentor view attendance history by date"""
+    """Mentor view attendance history by date (NO DUPLICATES)"""
     if 'user_id' not in session:
         flash('Please login first.', 'error')
         return redirect(url_for('auth.login'))
@@ -558,7 +563,7 @@ def mentor_attendance_history():
     
     cursor = conn.cursor(dictionary=True)
     
-    # Get ALL students with their attendance status for the selected date
+    # ✅ FIXED QUERY: Shows each student ONLY ONCE with latest record
     cursor.execute("""
         SELECT 
             sp.id as student_id,
@@ -570,7 +575,14 @@ def mentor_attendance_history():
             ar.record_time
         FROM student_profiles sp
         JOIN users u ON sp.user_id = u.id
-        LEFT JOIN attendance_records ar ON sp.id = ar.student_id AND ar.record_date = %s
+        LEFT JOIN attendance_records ar ON sp.id = ar.student_id 
+            AND ar.record_date = %s
+            AND ar.id = (
+                SELECT MAX(id) 
+                FROM attendance_records 
+                WHERE student_id = sp.id 
+                AND record_date = %s
+            )
         ORDER BY 
             CASE 
                 WHEN ar.status = 'present' THEN 1
@@ -578,7 +590,7 @@ def mentor_attendance_history():
                 ELSE 3
             END,
             u.name ASC
-    """, (selected_date,))
+    """, (selected_date, selected_date))
     
     records = cursor.fetchall()
     
@@ -614,6 +626,12 @@ def mentor_attendance_history():
                          absent_count=absent_count,
                          not_marked_count=not_marked_count,
                          today=datetime.now().date())
+
+
+# ==========================================
+# ADMIN - Attendance Reports
+# ==========================================
+
 @attendance_otp_bp.route('/admin/reports')
 def admin_reports():
     """Admin view all attendance reports with date/time"""

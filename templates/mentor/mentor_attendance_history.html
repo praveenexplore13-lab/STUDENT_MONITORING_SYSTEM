@@ -77,7 +77,6 @@
         .no-records { text-align: center; padding: 40px; color: #94a3b8; }
         .no-records i { font-size: 48px; color: #cbd5e1; display: block; margin-bottom: 15px; }
 
-        /* ===== NEW: Export Button Styles ===== */
         .export-btn {
             padding: 8px 20px;
             background: #0f3460;
@@ -99,7 +98,6 @@
         body.dark-mode .export-btn:hover {
             background: #818cf8;
         }
-        /* ===== END NEW ===== */
     </style>
 </head>
 <body>
@@ -113,7 +111,6 @@
                 <li><a href="{{ url_for('mentor.mentor_od_requests') }}"><i class="fas fa-calendar-check"></i> OD Requests</a></li>
                 <li><a href="{{ url_for('attendance_otp.mentor_attendance') }}"><i class="fas fa-qrcode"></i> Attendance</a></li>
                 <li class="active"><a href="{{ url_for('attendance_otp.mentor_attendance_history') }}"><i class="fas fa-history"></i> History</a></li>
-                
                 <li><a href="{{ url_for('mentor.mentor_profile') }}"><i class="fas fa-user-cog"></i> Profile</a></li>
                 <li><a href="{{ url_for('chat.mentor_chat') }}"><i class="fas fa-robot"></i> AI Chatbot</a></li>
                 <li><a href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -146,11 +143,9 @@
                                 <i class="fas fa-calendar-day"></i> Today
                             </a>
                             
-                            <!-- ===== NEW: Export Button ===== -->
                             <button type="button" onclick="exportAttendance()" class="export-btn">
                                 <i class="fas fa-file-export"></i> Export CSV
                             </button>
-                            <!-- ===== END NEW ===== -->
                         </form>
                     </div>
                 </div>
@@ -228,18 +223,50 @@
         </main>
     </div>
 
-    <!-- ===== NEW: Export JavaScript Function ===== -->
     <script>
         function exportAttendance() {
+            // Get data from the page
+            const items = document.querySelectorAll('.attendance-item');
             const date = '{{ selected_date.strftime("%d-%m-%Y") }}';
-            let csv = "\uFEFF"; // UTF-8 BOM for Excel compatibility
+            
+            // Create CSV header
+            let csv = "\uFEFF"; // UTF-8 BOM for Excel
             csv += "Student Name,Roll Number,Department,Status,Time\n";
             
-            {% for record in records %}
-                let status = '{% if record.status == "present" %}Present{% elif record.status == "absent" %}Absent{% else %}Not Marked{% endif %}';
-                csv += `"{{ record.student_name }}","{{ record.roll_number or 'N/A' }}","{{ record.department or 'N/A' }}","${status}","{{ record.record_time or 'N/A' }}"\n`;
-            {% endfor %}
+            // Loop through each attendance item
+            items.forEach(function(item) {
+                // Get student name
+                const nameEl = item.querySelector('.student-name');
+                const name = nameEl ? nameEl.textContent.trim() : '';
+                
+                // Get roll number
+                const rollEl = item.querySelector('.student-roll');
+                const roll = rollEl ? rollEl.textContent.trim().replace(/[()]/g, '') : '';
+                
+                // Get department
+                const deptEl = item.querySelector('.student-dept');
+                const dept = deptEl ? deptEl.textContent.trim() : '';
+                
+                // Get status
+                const badgeEl = item.querySelector('.status-badge');
+                let status = badgeEl ? badgeEl.textContent.trim() : '';
+                // Clean up status (remove emoji)
+                status = status.replace(/[✅❌⏳]/g, '').trim();
+                
+                // Get time
+                const timeEl = item.querySelector('.fa-clock');
+                let time = '';
+                if (timeEl) {
+                    const parent = timeEl.parentElement;
+                    time = parent ? parent.textContent.trim() : '';
+                    time = time.replace(/[🕐]/g, '').trim();
+                }
+                
+                // Add to CSV
+                csv += `"${name}","${roll}","${dept}","${status}","${time}"\n`;
+            });
             
+            // Download the file
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -251,6 +278,5 @@
             URL.revokeObjectURL(url);
         }
     </script>
-    <!-- ===== END NEW ===== -->
 </body>
 </html>
